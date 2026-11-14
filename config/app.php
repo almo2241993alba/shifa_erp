@@ -17,6 +17,8 @@ return [
 
     'initial_admin_password' => env('ADMIN_INITIAL_PASSWORD'),
 
+    'initial_cashier_password' => env('CASHIER_INITIAL_PASSWORD'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

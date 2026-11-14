@@ -6,8 +6,8 @@ use App\Models\Contact;
 use App\Models\FinancialTransaction;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use ReflectionMethod;
@@ -21,7 +21,10 @@ class PharmacyDatabaseSeederTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.initial_admin_password' => 'secure-test-password-2026']);
+        config([
+            'app.initial_admin_password' => 'secure-test-password-2026',
+            'app.initial_cashier_password' => 'secure-cashier-password-2026',
+        ]);
     }
 
     public function test_database_seeder_builds_single_branch_foundation_idempotently(): void
@@ -36,7 +39,7 @@ class PharmacyDatabaseSeederTest extends TestCase
         $this->assertDatabaseCount('dosage_forms', 8);
         $this->assertDatabaseCount('units', 7);
         $this->assertDatabaseCount('expense_types', 6);
-        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('users', 2);
         $this->assertDatabaseCount('medicines', 0);
 
         $contact = Contact::where('name', 'عميل ومورد نقدي عام')->firstOrFail();
@@ -47,6 +50,13 @@ class PharmacyDatabaseSeederTest extends TestCase
 
         $admin = User::where('email', 'admin@shifa.com')->firstOrFail();
         $this->assertTrue(Hash::check('secure-test-password-2026', $admin->password));
+        $this->assertSame('admin', $admin->role);
+
+        $cashier = User::where('email', 'cashier@shifa.com')->firstOrFail();
+        $this->assertSame('كاشير الصيدلية', $cashier->name);
+        $this->assertSame('cashier', $cashier->role);
+        $this->assertSame($admin->branch_id, $cashier->branch_id);
+        $this->assertTrue(Hash::check('secure-cashier-password-2026', $cashier->password));
     }
 
     public function test_uuid_models_generate_string_primary_keys_and_payment_table_exists(): void
@@ -71,8 +81,8 @@ class PharmacyDatabaseSeederTest extends TestCase
         $relationshipCount = 0;
 
         foreach (glob(app_path('Models/*.php')) as $file) {
-            $class = 'App\\Models\\' . pathinfo($file, PATHINFO_FILENAME);
-            $model = new $class();
+            $class = 'App\\Models\\'.pathinfo($file, PATHINFO_FILENAME);
+            $model = new $class;
             $columns = Schema::getColumnListing($model->getTable());
 
             foreach ($model->getFillable() as $attribute) {
@@ -85,9 +95,9 @@ class PharmacyDatabaseSeederTest extends TestCase
 
                 if (
                     $method->getDeclaringClass()->getName() !== $class
-                    || !$method->isPublic()
-                    || !$returnType
-                    || !is_a($returnType->getName(), Relation::class, true)
+                    || ! $method->isPublic()
+                    || ! $returnType
+                    || ! is_a($returnType->getName(), Relation::class, true)
                 ) {
                     continue;
                 }
