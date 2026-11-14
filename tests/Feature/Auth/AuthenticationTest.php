@@ -56,7 +56,7 @@ class AuthenticationTest extends TestCase
 
     public function test_navigation_menu_can_be_rendered(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($user);
 
@@ -64,7 +64,28 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSeeVolt('layout.navigation');
+            ->assertSee('لوحة الإدارة')
+            ->assertSee('نقطة البيع');
+    }
+
+    public function test_cashiers_are_redirected_to_their_pos_workspace(): void
+    {
+        $user = User::factory()->create(['role' => 'cashier']);
+
+        $this->actingAs($user)
+            ->get('/dashboard')
+            ->assertRedirect(route('pharmacy.cashier'));
+    }
+
+    public function test_inactive_users_are_logged_out_of_protected_pages(): void
+    {
+        $user = User::factory()->create(['is_active' => false]);
+
+        $this->actingAs($user)
+            ->get('/profile')
+            ->assertForbidden();
+
+        $this->assertGuest();
     }
 
     public function test_users_can_logout(): void

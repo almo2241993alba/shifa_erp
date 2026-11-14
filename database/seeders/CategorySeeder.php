@@ -2,16 +2,27 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        $categories = [
+            'مسكنات وخافضات حرارة',
+            'مضادات حيوية',
+            'أدوية الملاريا والطفيليات',
+            'أدوية الجهاز الهضمي',
+            'أدوية الضغط والقلب',
+            'أدوية السكري',
+            'فيتامينات ومكملات غذائية',
+            'مستلزمات طبية وحقن',
+            'مستحضرات تجميل وعناية',
+        ];
+
+        foreach ($categories as $name) {
+            Category::firstOrCreate(['name' => $name], ['is_active' => true]);
+        }
     }
 }

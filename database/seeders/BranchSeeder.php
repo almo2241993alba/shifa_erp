@@ -2,16 +2,20 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Branch;
 use Illuminate\Database\Seeder;
 
 class BranchSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        Branch::firstOrCreate(
+            ['code' => 'BR-001'],
+            [
+                'name' => 'الفرع الرئيسي - صيدلية الشفاء',
+                'is_main' => true,
+                'is_active' => true,
+            ]
+        );
     }
 }

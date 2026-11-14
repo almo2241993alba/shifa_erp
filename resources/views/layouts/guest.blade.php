@@ -1,30 +1,45 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="ar" dir="rtl">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
+        <meta name="theme-color" content="#102f40">
+        <title>{{ config('app.name', 'شفاء') }}</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/" wire:navigate>
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+    <body class="auth-body">
+        <main class="auth-layout">
+            <section class="auth-brand-panel">
+                <a class="brand-lockup auth-brand-lockup" href="{{ url('/') }}">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 32 32" fill="none"><path d="M12 4h8v8h8v8h-8v8h-8v-8H4v-8h8V4Z" fill="currentColor"/></svg>
+                    </span>
+                    <span class="brand-copy"><strong>{{ config('app.name', 'شفاء') }}</strong><small>إدارة صيدلية أكثر ذكاءً</small></span>
                 </a>
-            </div>
-
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
-            </div>
-        </div>
+                <div class="auth-brand-copy">
+                    <span class="eyebrow eyebrow-light">منصة الصيدلية المتكاملة</span>
+                    <h1>كل تفاصيل صيدليتك،<br><em>في مكان واحد.</em></h1>
+                    <p>من نقطة البيع والمخزون إلى الحسابات والتأمين — أدوات واضحة تساعدك على إدارة يومك بثقة.</p>
+                </div>
+                <div class="auth-feature-row">
+                    <span><i>✓</i> مخزون أدق</span>
+                    <span><i>✓</i> بيع أسرع</span>
+                    <span><i>✓</i> تقارير أوضح</span>
+                </div>
+                <span class="auth-orbit auth-orbit-one"></span>
+                <span class="auth-orbit auth-orbit-two"></span>
+            </section>
+            <section class="auth-form-panel">
+                <div class="auth-mobile-brand">
+                    <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M12 4h8v8h8v8h-8v8h-8v-8H4v-8h8V4Z" fill="currentColor"/></svg></span>
+                    <strong>{{ config('app.name', 'شفاء') }}</strong>
+                </div>
+                <div class="auth-card">
+                    {{ $slot }}
+                </div>
+                <p class="auth-copyright">© {{ now()->year }} {{ config('app.name', 'شفاء') }} · جميع الحقوق محفوظة</p>
+            </section>
+        </main>
     </body>
 </html>

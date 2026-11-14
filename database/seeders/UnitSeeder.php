@@ -2,16 +2,25 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Unit;
 use Illuminate\Database\Seeder;
 
 class UnitSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        $units = [
+            'كرتون (Carton)',
+            'علبة (Box)',
+            'شريط (Strip)',
+            'زجاجة (Bottle)',
+            'أمبول / حقنة (Ampoule)',
+            'أنبوب / مرهم (Tube)',
+            'قطعة / سرنجة (Piece)',
+        ];
+
+        foreach ($units as $name) {
+            Unit::firstOrCreate(['name' => $name], ['is_active' => true]);
+        }
     }
 }
