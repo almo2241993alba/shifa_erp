@@ -82,7 +82,7 @@ class CashierPageController extends Controller
     {
         $user = $request->user();
         $openSession = PosSession::query()
-            ->with('treasury:id,name,current_balance')
+            ->with('treasury:id,name,current_balance,drawer_reserve_amount')
             ->where('user_id', $user->id)
             ->where('status', 'open')
             ->first();
@@ -90,8 +90,9 @@ class CashierPageController extends Controller
         $treasuries = Treasury::query()
             ->where('is_active', true)
             ->when($user->branch_id !== null, fn (Builder $query) => $query->where('branch_id', $user->branch_id))
+            ->when($user->branch_id === null && $user->role !== 'admin', fn (Builder $query) => $query->whereRaw('1 = 0'))
             ->orderBy('name')
-            ->get(['id', 'branch_id', 'name', 'type']);
+            ->get(['id', 'branch_id', 'name', 'type', 'drawer_reserve_amount']);
 
         $branches = $user->role === 'admin'
             ? Branch::query()->where('is_active', true)->orderBy('name')->get(['id', 'name'])

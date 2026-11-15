@@ -21,6 +21,7 @@ use App\Http\Controllers\InsurancePlanMedicineController;
 use App\Http\Controllers\InsurancePolicyController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\ManagementPageController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MedicineAccessoryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineUnitController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
+Route::post('locale', LocaleController::class)->name('locale.switch');
 
 Route::get('dashboard', DashboardController::class)
     ->middleware(['auth', 'verified', 'active'])

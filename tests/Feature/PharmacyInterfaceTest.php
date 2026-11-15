@@ -29,6 +29,7 @@ class PharmacyInterfaceTest extends TestCase
     public function test_cashier_screen_renders_and_product_lookup_is_branch_safe(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'cashier']))
+            ->withSession(['locale' => 'ar'])
             ->get('/pharmacy/cashier')
             ->assertOk()
             ->assertSee('سلة البيع')

@@ -2,6 +2,9 @@ const cashierRoot = document.querySelector('[data-cashier-root]');
 
 if (cashierRoot) {
     const config = JSON.parse(cashierRoot.dataset.config);
+    const i18n = window.pharmacyI18n ?? {};
+    const text = (key) => i18n[key] ?? key;
+    const locale = i18n.locale === 'en' ? 'en' : 'ar';
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
     const productSearchForm = cashierRoot.querySelector('[data-product-search-form]');
     const productSearch = cashierRoot.querySelector('[data-product-search]');
@@ -13,6 +16,8 @@ if (cashierRoot) {
     const discountReason = cashierRoot.querySelector('[data-discount-reason]');
     const paymentMethod = cashierRoot.querySelector('[data-payment-method]');
     const paymentAmount = cashierRoot.querySelector('[data-payment-amount]');
+    const networkField = cashierRoot.querySelector('[data-network-field]');
+    const networkTreasury = cashierRoot.querySelector('[data-network-treasury]');
     const checkoutButton = cashierRoot.querySelector('[data-checkout]');
     const quoteError = cashierRoot.querySelector('[data-quote-error]');
     const toastRegion = cashierRoot.querySelector('[data-toast-region]');
@@ -34,7 +39,7 @@ if (cashierRoot) {
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
 
-    const money = (value) => `${new Intl.NumberFormat('ar', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value ?? 0))} ${escapeHtml(config.currency)}`;
+    const money = (value) => `${new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value ?? 0))} ${escapeHtml(config.currency)}`;
 
     const request = async (url, options = {}) => {
         const response = await fetch(url, {
@@ -48,7 +53,7 @@ if (cashierRoot) {
         });
         const payload = response.status === 204 ? null : await response.json().catch(() => ({}));
         if (!response.ok) {
-            const error = new Error(payload?.message ?? 'تعذر إكمال الطلب. تحقق من البيانات وحاول مرة أخرى.');
+            const error = new Error(payload?.message ?? text('requestFailed'));
             error.payload = payload;
             throw error;
         }
@@ -95,7 +100,7 @@ if (cashierRoot) {
         .sort((left, right) => Number(right.is_base_unit) - Number(left.is_base_unit));
 
     const loadProducts = async (search = '') => {
-        productGrid.innerHTML = '<div class="catalog-placeholder"><span class="loading-spinner"></span><p>جارٍ البحث عن الأصناف...</p></div>';
+        productGrid.innerHTML = `<div class="catalog-placeholder"><span class="loading-spinner"></span><p>${escapeHtml(text('searchingProducts'))}</p></div>`;
         closeError('[data-catalog-feedback]');
         const params = new URLSearchParams({ per_page: '24' });
         if (search.trim()) params.set('search', search.trim());
@@ -105,7 +110,7 @@ if (cashierRoot) {
             const response = await request(`/pharmacy/cashier/products?${params.toString()}`);
             const medicines = (response.data ?? []).filter((medicine) => medicine.is_active);
             renderProducts(medicines);
-            cashierRoot.querySelector('[data-product-count]').textContent = `${new Intl.NumberFormat('ar').format(medicines.length)} صنف`;
+            cashierRoot.querySelector('[data-product-count]').textContent = `${new Intl.NumberFormat(locale).format(medicines.length)} ${text('productCount')}`;
         } catch (error) {
             const feedback = cashierRoot.querySelector('[data-catalog-feedback]');
             feedback.textContent = error.message;
@@ -119,7 +124,7 @@ if (cashierRoot) {
         if (!medicines.length) {
             const empty = document.createElement('div');
             empty.className = 'catalog-empty';
-            empty.innerHTML = '<span>⌕</span><strong>لم نجد أصنافًا مطابقة</strong><small>جرّب البحث باسم آخر أو امسح الباركود.</small>';
+            empty.innerHTML = `<span>⌕</span><strong>${escapeHtml(text('noMatchingProducts'))}</strong><small>${escapeHtml(text('tryAnotherSearch'))}</small>`;
             productGrid.append(empty);
             return;
         }
@@ -132,16 +137,16 @@ if (cashierRoot) {
             card.className = 'product-card';
             card.innerHTML = `
                 <div class="product-card-top">
-                    <span class="product-symbol">${escapeHtml((medicine.trade_name ?? 'د').slice(0, 1))}</span>
-                    <span class="product-stock ${stock > 0 ? '' : 'product-out-of-stock'}">${stock > 0 ? `المتاح ${new Intl.NumberFormat('ar').format(stock)}` : 'نفد المخزون'}</span>
+                    <span class="product-symbol">${escapeHtml((medicine.trade_name ?? 'M').slice(0, 1))}</span>
+                    <span class="product-stock ${stock > 0 ? '' : 'product-out-of-stock'}">${stock > 0 ? `${text('available')} ${new Intl.NumberFormat(locale).format(stock)}` : text('outOfStock')}</span>
                 </div>
                 <div class="product-info">
                     <strong>${escapeHtml(medicine.trade_name)}</strong>
-                    <small>${escapeHtml(medicine.scientific_name ?? medicine.category?.name ?? 'صنف صيدلاني')}</small>
+                    <small>${escapeHtml(medicine.scientific_name ?? medicine.category?.name ?? text('pharmacyItem'))}</small>
                 </div>
                 <div class="product-card-bottom">
-                    <span>${unit ? `${money(unit.selling_price)} <small>/${escapeHtml(unit.unit.name)}</small>` : 'السعر غير محدد'}</span>
-                    <button class="add-product-button" type="button" aria-label="إضافة ${escapeHtml(medicine.trade_name)}" data-add-product="${escapeHtml(medicine.id)}" ${!unit || stock < Number(unit.conversion_factor) ? 'disabled' : ''}>
+                    <span>${unit ? `${money(unit.selling_price)} <small>/${escapeHtml(unit.unit.name)}</small>` : text('priceNotSet')}</span>
+                    <button class="add-product-button" type="button" aria-label="${escapeHtml(text('addItem'))} ${escapeHtml(medicine.trade_name)}" data-add-product="${escapeHtml(medicine.id)}" ${!unit || stock < Number(unit.conversion_factor) ? 'disabled' : ''}>
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                     </button>
                 </div>`;
@@ -155,7 +160,7 @@ if (cashierRoot) {
         const units = sellableUnits(medicine);
         const unit = units[0];
         if (!unit) {
-            toast('لم يتم إعداد وحدة بيع لهذا الصنف.', 'error');
+            toast(text('unitNotConfigured'), 'error');
             return;
         }
 
@@ -167,13 +172,13 @@ if (cashierRoot) {
         }
         renderCart();
         scheduleQuote();
-        toast('تمت إضافة الصنف إلى الفاتورة.');
+        toast(text('itemAdded'));
     };
 
     const renderCart = () => {
         cartRoot.replaceChildren();
         if (!cart.length) {
-            cartRoot.innerHTML = '<div class="cart-empty"><span class="cart-empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 4h2l2.5 11h10L20 8H6M9 19a1 1 0 1 0 0 .01M17 19a1 1 0 1 0 0 .01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>السلة فارغة</strong><small>أضف صنفًا للبدء في إعداد الفاتورة.</small></div>';
+            cartRoot.innerHTML = `<div class="cart-empty"><span class="cart-empty-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 4h2l2.5 11h10L20 8H6M9 19a1 1 0 1 0 0 .01M17 19a1 1 0 1 0 0 .01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><strong>${escapeHtml(text('emptyCart'))}</strong><small>${escapeHtml(text('addItemToStart'))}</small></div>`;
             checkoutButton.disabled = true;
             updateTotals(null);
             return;
@@ -184,16 +189,16 @@ if (cashierRoot) {
             row.className = 'cart-item';
             row.innerHTML = `
                 <div class="cart-item-heading">
-                    <span class="cart-item-monogram">${escapeHtml((item.medicine.trade_name ?? 'د').slice(0, 1))}</span>
+                    <span class="cart-item-monogram">${escapeHtml((item.medicine.trade_name ?? 'M').slice(0, 1))}</span>
                     <div class="cart-item-name"><strong>${escapeHtml(item.medicine.trade_name)}</strong><small>${money(item.unit.selling_price)} / ${escapeHtml(item.unit.unit?.name ?? '')}</small></div>
-                    <button class="cart-remove" type="button" aria-label="حذف الصنف" data-remove-item="${index}">×</button>
+                    <button class="cart-remove" type="button" aria-label="${escapeHtml(text('removeItem'))}" data-remove-item="${index}">×</button>
                 </div>
                 <div class="cart-item-controls">
-                    <select aria-label="وحدة البيع" data-cart-unit="${index}">${sellableUnits(item.medicine).map((unit) => `<option value="${escapeHtml(unit.unit_id)}" ${Number(unit.unit_id) === Number(item.unit.unit_id) ? 'selected' : ''} ${availableStock(item.medicine) < Number(unit.conversion_factor) ? 'disabled' : ''}>${escapeHtml(unit.unit.name)} · ${money(unit.selling_price)}</option>`).join('')}</select>
+                    <select aria-label="${escapeHtml(text('saleUnit'))}" data-cart-unit="${index}">${sellableUnits(item.medicine).map((unit) => `<option value="${escapeHtml(unit.unit_id)}" ${Number(unit.unit_id) === Number(item.unit.unit_id) ? 'selected' : ''} ${availableStock(item.medicine) < Number(unit.conversion_factor) ? 'disabled' : ''}>${escapeHtml(unit.unit.name)} · ${money(unit.selling_price)}</option>`).join('')}</select>
                     <div class="quantity-control">
-                        <button type="button" aria-label="تقليل الكمية" data-quantity-step="-1" data-index="${index}">−</button>
-                        <input type="number" min="1" step="1" value="${item.quantity}" aria-label="الكمية" data-quantity="${index}">
-                        <button type="button" aria-label="زيادة الكمية" data-quantity-step="1" data-index="${index}">+</button>
+                        <button type="button" aria-label="${escapeHtml(text('decreaseQuantity'))}" data-quantity-step="-1" data-index="${index}">−</button>
+                        <input type="number" min="1" step="1" value="${item.quantity}" aria-label="${escapeHtml(text('quantity'))}" data-quantity="${index}">
+                        <button type="button" aria-label="${escapeHtml(text('increaseQuantity'))}" data-quantity-step="1" data-index="${index}">+</button>
                     </div>
                     <strong class="cart-line-total">${money(Number(item.unit.selling_price) * item.quantity)}</strong>
                 </div>`;
@@ -287,15 +292,42 @@ if (cashierRoot) {
 
     const filterTreasuries = () => {
         const branchSelect = cashierRoot.querySelector('[data-session-branch]');
-        const treasurySelect = cashierRoot.querySelector('[data-session-treasury]');
         const branchId = branchSelect?.value || selectedBranchId;
-        [...treasurySelect.options].forEach((option, index) => {
-            if (index === 0) return;
-            const matchesBranch = !branchId || option.dataset.branch === String(branchId);
-            option.hidden = !matchesBranch;
-            if (!matchesBranch && option.selected) option.selected = false;
+        [
+            ['[data-session-treasury]', 'cash_drawer'],
+            ['[data-network-treasury]', 'bank'],
+            ['[data-closing-safe]', 'main_safe'],
+        ].forEach(([selector, requiredType]) => {
+            const select = cashierRoot.querySelector(selector);
+            if (!select) return;
+            [...select.options].forEach((option, index) => {
+                if (index === 0) return;
+                const matchesBranch = (!branchId || option.dataset.branch === String(branchId))
+                    && option.dataset.type === requiredType;
+                option.hidden = !matchesBranch;
+                if (!matchesBranch && option.selected) option.selected = false;
+            });
         });
     };
+
+    const updateNetworkField = () => {
+        const isCardPayment = paymentMethod.value === 'card';
+        networkField.hidden = !isCardPayment;
+        networkTreasury.required = isCardPayment;
+        if (!isCardPayment) networkTreasury.value = '';
+        filterTreasuries();
+    };
+
+    const updateTransferEstimate = () => {
+        const actualCash = Number(cashierRoot.querySelector('[data-closing-cash]').value || 0);
+        const reserve = Number(activeSession?.treasury?.drawer_reserve_amount ?? 0);
+        const transfer = Math.max(0, actualCash - reserve);
+        cashierRoot.querySelector('[data-transfer-estimate]').textContent = money(transfer);
+    };
+
+    updateNetworkField();
+    filterTreasuries();
+    updateTransferEstimate();
 
     productSearchForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -371,6 +403,7 @@ if (cashierRoot) {
     paymentMethod.addEventListener('change', () => {
         delete paymentAmount.dataset.touched;
         if (quote) paymentAmount.value = Number(quote.patient_due ?? 0).toFixed(2);
+        updateNetworkField();
     });
     cashierRoot.querySelector('[data-open-session]')?.addEventListener('click', openSessionDialog);
     cashierRoot.querySelectorAll('[data-session-modal-close]').forEach((button) => button.addEventListener('click', closeSessionDialog));
@@ -385,7 +418,10 @@ if (cashierRoot) {
     cashierRoot.querySelector('[data-session-treasury]')?.addEventListener('change', (event) => {
         const branchId = event.target.selectedOptions[0]?.dataset.branch;
         if (branchId) selectedBranchId = Number(branchId);
+        filterTreasuries();
     });
+    networkTreasury?.addEventListener('change', filterTreasuries);
+    cashierRoot.querySelector('[data-closing-cash]')?.addEventListener('input', updateTransferEstimate);
     openForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const errorBox = cashierRoot.querySelector('[data-session-error]');
@@ -405,7 +441,7 @@ if (cashierRoot) {
                 body: JSON.stringify(payload),
             });
             activeSession = response.data;
-            toast('تم فتح جلسة الكاشير بنجاح.');
+            toast(text('sessionOpened'));
             window.location.reload();
         } catch (error) {
             showError(errorBox, error);
@@ -416,6 +452,8 @@ if (cashierRoot) {
     cashierRoot.querySelector('[data-close-session]')?.addEventListener('click', () => {
         closeModal.hidden = false;
         document.body.classList.add('modal-visible');
+        filterTreasuries();
+        updateTransferEstimate();
     });
     cashierRoot.querySelectorAll('[data-close-session-modal]').forEach((button) => button.addEventListener('click', () => {
         closeModal.hidden = true;
@@ -437,7 +475,10 @@ if (cashierRoot) {
             const formData = new FormData(closeForm);
             await request(`/pharmacy/pos-sessions/${encodeURIComponent(activeSession.id)}/close`, {
                 method: 'POST',
-                body: JSON.stringify({ actual_closing_cash: Number(formData.get('actual_closing_cash')) }),
+                body: JSON.stringify({
+                    actual_closing_cash: Number(formData.get('actual_closing_cash')),
+                    closing_treasury_id: Number(formData.get('closing_treasury_id')),
+                }),
             });
             document.addEventListener('keydown', (event) => {
                 if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -452,7 +493,7 @@ if (cashierRoot) {
                     }
                 }
             });
-            toast('تم إغلاق الجلسة وتسوية الوردية.');
+            toast(text('sessionClosed'));
             window.location.reload();
         } catch (error) {
             showError(errorBox, error);
@@ -462,8 +503,13 @@ if (cashierRoot) {
     });
     checkoutButton.addEventListener('click', async () => {
         if (!activeSession || !quote || !cart.length) return;
+        if (paymentMethod.value === 'card' && !networkTreasury.value) {
+            toast(text('cashNetworkRequired'), 'error');
+            networkTreasury.focus();
+            return;
+        }
         checkoutButton.disabled = true;
-        checkoutButton.querySelector('span').textContent = 'جارٍ إتمام البيع...';
+        checkoutButton.querySelector('span').textContent = text('completingSale');
         closeError('[data-quote-error]');
         try {
             const due = Number(quote.patient_due ?? 0);
@@ -471,6 +517,7 @@ if (cashierRoot) {
             const payments = due <= 0 ? [] : [{
                 payment_method: paymentMethod.value,
                 amount: amount > 0 ? amount : due,
+                ...(paymentMethod.value === 'card' ? { treasury_id: Number(networkTreasury.value) } : {}),
             }];
             const response = await request('/pharmacy/sales', {
                 method: 'POST',
@@ -488,7 +535,7 @@ if (cashierRoot) {
                     payments,
                 }),
             });
-            toast(`تمت الفاتورة ${response.data.invoice_number} بنجاح.`);
+            toast(`${text('saleCompleted')} ${response.data.invoice_number}`);
             cart = [];
             quote = null;
             discountInput.value = '0';
@@ -501,7 +548,7 @@ if (cashierRoot) {
         } catch (error) {
             showError(quoteError, error);
         } finally {
-            checkoutButton.querySelector('span').textContent = 'تأكيد وإتمام البيع';
+            checkoutButton.querySelector('span').textContent = text('completeSale');
             checkoutButton.disabled = !activeSession || cart.length === 0 || !quote;
         }
     });

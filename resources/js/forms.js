@@ -10,7 +10,10 @@ function initializeFormEnhancements() {
             const visible = input.type === 'password';
             input.type = visible ? 'text' : 'password';
             toggle.setAttribute('aria-pressed', String(visible));
-            toggle.setAttribute('aria-label', visible ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
+            const labels = document.documentElement.lang === 'en'
+                ? { show: 'Show password', hide: 'Hide password' }
+                : { show: 'إظهار كلمة المرور', hide: 'إخفاء كلمة المرور' };
+            toggle.setAttribute('aria-label', visible ? labels.hide : labels.show);
         });
     });
 

@@ -2,6 +2,9 @@ const root = document.querySelector('[data-management-root]');
 
 if (root) {
     const config = JSON.parse(root.dataset.config);
+    const i18n = window.pharmacyI18n ?? {};
+    const text = (key) => i18n[key] ?? key;
+    const locale = i18n.locale === 'en' ? 'en' : 'ar';
     const currency = root.dataset.currency;
     const tableHead = root.querySelector('[data-table-head]');
     const tableBody = root.querySelector('[data-table-body]');
@@ -47,7 +50,7 @@ if (root) {
         if (response.status === 204) return null;
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-            const error = new Error(payload.message ?? 'تعذر إكمال الطلب. حاول مرة أخرى.');
+            const error = new Error(payload.message ?? text('genericRequestFailed'));
             error.payload = payload;
             throw error;
         }
@@ -64,34 +67,42 @@ if (root) {
 
     const formatValue = (column, value) => {
         if (value === null || value === undefined || value === '') return '—';
-        if (column.format === 'boolean') return value ? 'نعم' : 'لا';
+        if (column.format === 'boolean') return value ? text('yes') : text('no');
         if (column.format === 'status') {
             const active = ['1', 'true', 'active', 'completed', 'paid', 'approved', 'received'].includes(String(value).toLowerCase());
             const labels = {
-                active: 'نشط',
-                inactive: 'غير نشط',
-                completed: 'مكتملة',
-                pending: 'قيد المراجعة',
-                approved: 'معتمدة',
-                rejected: 'مرفوضة',
-                paid: 'مدفوعة',
-                partial: 'مدفوعة جزئيًا',
-                unpaid: 'غير مدفوعة',
-                received: 'مستلمة',
-                open: 'مفتوحة',
-                closed: 'مغلقة',
+                active: text('active'),
+                inactive: text('inactive'),
+                completed: text('completed'),
+                pending: text('pending'),
+                approved: text('approved'),
+                rejected: text('rejected'),
+                paid: text('paid'),
+                partial: text('partial'),
+                unpaid: text('unpaid'),
+                received: text('received'),
+                open: text('open'),
+                closed: text('closed'),
             };
-            const label = labels[String(value).toLowerCase()] ?? (value ? 'نشط' : 'غير نشط');
+            const label = labels[String(value).toLowerCase()] ?? (value ? text('active') : text('inactive'));
             return `<span class="status-badge ${active ? 'status-success' : 'status-neutral'}">${escapeHtml(label)}</span>`;
         }
+        if (column.key === 'type') {
+            const types = {
+                cash_drawer: text('typeCashDrawer'),
+                main_safe: text('typeMainSafe'),
+                bank: text('typeBank'),
+            };
+            if (types[value]) return escapeHtml(types[value]);
+        }
         if (column.format === 'money') {
-            return `${new Intl.NumberFormat('ar', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value))} ${escapeHtml(currency)}`;
+            return `${new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value))} ${escapeHtml(currency)}`;
         }
         if (column.format === 'date') {
             const date = new Date(value);
-            return Number.isNaN(date.getTime()) ? escapeHtml(value) : new Intl.DateTimeFormat('ar', { dateStyle: 'medium' }).format(date);
+            return Number.isNaN(date.getTime()) ? escapeHtml(value) : new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
         }
-        if (typeof value === 'boolean') return value ? 'نعم' : 'لا';
+        if (typeof value === 'boolean') return value ? text('yes') : text('no');
         return escapeHtml(value);
     };
 
@@ -104,7 +115,7 @@ if (root) {
         });
         if (config.writable) {
             const th = document.createElement('th');
-            th.textContent = 'إجراءات';
+            th.textContent = text('actions');
             tableHead.append(th);
         }
     };
@@ -115,7 +126,7 @@ if (root) {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
             cell.colSpan = config.columns.length + (config.writable ? 1 : 0);
-            cell.innerHTML = '<div class="empty-state compact-empty"><span class="empty-check">✓</span><strong>لا توجد سجلات مطابقة</strong><small>جرّب تغيير عبارة البحث أو أضف سجلًا جديدًا.</small></div>';
+            cell.innerHTML = `<div class="empty-state compact-empty"><span class="empty-check">✓</span><strong>${escapeHtml(text('noRecords'))}</strong><small>${escapeHtml(text('changeSearchOrAdd'))}</small></div>`;
             row.append(cell);
             tableBody.append(row);
             return;
@@ -137,7 +148,7 @@ if (root) {
             if (config.writable) {
                 const cell = document.createElement('td');
                 cell.className = 'table-actions';
-                cell.innerHTML = `<button type="button" class="table-action" data-edit="${escapeHtml(record.id)}">تعديل</button><button type="button" class="table-action table-action-danger" data-delete="${escapeHtml(record.id)}">حذف</button>`;
+                cell.innerHTML = `<button type="button" class="table-action" data-edit="${escapeHtml(record.id)}">${escapeHtml(text('edit'))}</button>${config.deletable ? `<button type="button" class="table-action table-action-danger" data-delete="${escapeHtml(record.id)}">${escapeHtml(text('delete'))}</button>` : ''}`;
                 row.append(cell);
             }
             tableBody.append(row);
@@ -148,13 +159,13 @@ if (root) {
         pagination.replaceChildren();
         if (!meta || meta.last_page <= 1) return;
         const info = document.createElement('span');
-        info.textContent = `صفحة ${meta.current_page} من ${meta.last_page}`;
+        info.textContent = `${text('page')} ${meta.current_page} ${text('of')} ${meta.last_page}`;
         pagination.append(info);
         const controls = document.createElement('div');
         controls.className = 'pagination-controls';
         [
-            { label: 'السابق', page: meta.current_page - 1, disabled: meta.current_page <= 1 },
-            { label: 'التالي', page: meta.current_page + 1, disabled: meta.current_page >= meta.last_page },
+            { label: text('previous'), page: meta.current_page - 1, disabled: meta.current_page <= 1 },
+            { label: text('next'), page: meta.current_page + 1, disabled: meta.current_page >= meta.last_page },
         ].forEach((item) => {
             const button = document.createElement('button');
             button.type = 'button';
@@ -168,18 +179,18 @@ if (root) {
     };
 
     const loadRecords = async () => {
-        tableBody.innerHTML = `<tr><td class="table-loading" colspan="${config.columns.length + (config.writable ? 1 : 0)}"><span class="loading-spinner"></span> جارٍ تحميل البيانات...</td></tr>`;
+        tableBody.innerHTML = `<tr><td class="table-loading" colspan="${config.columns.length + (config.writable ? 1 : 0)}"><span class="loading-spinner"></span> ${escapeHtml(text('loadingData'))}</td></tr>`;
         const params = new URLSearchParams({ per_page: '15', page: String(currentPage) });
         if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
 
         try {
             const result = await request(`${config.endpoint}?${params.toString()}`);
             renderRows(result.data ?? []);
-            countLabel.textContent = `${new Intl.NumberFormat('ar').format(result.meta?.total ?? result.data?.length ?? 0)} سجل`;
+            countLabel.textContent = `${new Intl.NumberFormat(locale).format(result.meta?.total ?? result.data?.length ?? 0)} ${text('records')}`;
             renderPagination(result.meta);
         } catch (error) {
             tableBody.innerHTML = `<tr><td class="table-error" colspan="${config.columns.length + (config.writable ? 1 : 0)}">${escapeHtml(error.message)}</td></tr>`;
-            countLabel.textContent = 'تعذر تحميل البيانات';
+            countLabel.textContent = text('couldNotLoad');
         }
     };
 
@@ -206,7 +217,7 @@ if (root) {
             input = document.createElement('select');
             const empty = document.createElement('option');
             empty.value = '';
-            empty.textContent = 'اختر قيمة';
+            empty.textContent = text('selectValue');
             input.append(empty);
             const optionRows = field.options
                 ? Object.entries(field.options).map(([value, labelText]) => ({ value, label: labelText }))
@@ -250,7 +261,7 @@ if (root) {
 
     const openModal = async (record = null) => {
         activeRecord = record;
-        modalTitle.textContent = record ? 'تعديل البيانات' : 'إضافة سجل جديد';
+        modalTitle.textContent = record ? text('editRecord') : text('newRecord');
         formError.hidden = true;
         fieldsRoot.replaceChildren();
         modal.hidden = false;
@@ -335,10 +346,10 @@ if (root) {
 
         const deleteButton = event.target.closest('[data-delete]');
         if (!deleteButton) return;
-        if (!window.confirm('هل تريد حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء.')) return;
+        if (!window.confirm(text('deleteConfirm'))) return;
         try {
             await request(`${config.endpoint}/${encodeURIComponent(deleteButton.dataset.delete)}`, { method: 'DELETE' });
-            showToast('تم حذف السجل بنجاح.');
+            showToast(text('deleted'));
             loadRecords();
         } catch (error) {
             showToast(error.message, 'error');
@@ -348,7 +359,7 @@ if (root) {
         event.preventDefault();
         formError.hidden = true;
         saveButton.disabled = true;
-        saveButton.textContent = 'جارٍ الحفظ...';
+        saveButton.textContent = text('saving');
         try {
             const endpoint = activeRecord
                 ? `${config.endpoint}/${encodeURIComponent(activeRecord.id)}`
@@ -358,13 +369,13 @@ if (root) {
                 body: JSON.stringify(readForm()),
             });
             closeModal();
-            showToast(activeRecord ? 'تم تحديث السجل بنجاح.' : 'تمت إضافة السجل بنجاح.');
+            showToast(activeRecord ? text('updated') : text('created'));
             loadRecords();
         } catch (error) {
             showError(error);
         } finally {
             saveButton.disabled = false;
-            saveButton.textContent = 'حفظ البيانات';
+            saveButton.textContent = text('saveChanges');
         }
     });
 }

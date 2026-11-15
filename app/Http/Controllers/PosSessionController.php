@@ -61,6 +61,7 @@ class PosSessionController extends Controller
     {
         $data = $request->validate([
             'actual_closing_cash' => ['required', 'numeric', 'min:0'],
+            'closing_treasury_id' => ['required', 'integer', 'exists:treasuries,id'],
             'notes' => ['nullable', 'string'],
         ]);
 
@@ -69,6 +70,7 @@ class PosSessionController extends Controller
                 $session,
                 $request->user(),
                 (float) $data['actual_closing_cash'],
+                (int) $data['closing_treasury_id'],
                 $data['notes'] ?? null,
             ),
         ]);

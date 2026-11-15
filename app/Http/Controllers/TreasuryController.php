@@ -39,6 +39,11 @@ class TreasuryController extends PharmacyResourceController
             ],
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::in(['cash_drawer', 'main_safe', 'bank'])],
+            'drawer_reserve_amount' => [
+                Rule::prohibitedIf(request()->user()->role !== 'admin'),
+                'numeric',
+                'min:0',
+            ],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

@@ -76,6 +76,7 @@ class SaleController extends Controller
             'payments' => ['sometimes', 'array'],
             'payments.*.payment_method' => ['required', 'in:cash,card,credit'],
             'payments.*.amount' => ['required', 'numeric', 'gt:0'],
+            'payments.*.treasury_id' => ['nullable', 'integer', 'exists:treasuries,id'],
             'payments.*.reference' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);

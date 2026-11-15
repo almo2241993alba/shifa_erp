@@ -15,11 +15,15 @@ class PosSession extends Model
         'branch_id',
         'user_id',
         'treasury_id',
+        'closing_treasury_id',
         'opened_at',
         'closed_at',
         'opening_cash',
         'expected_cash',
         'actual_closing_cash',
+        'cash_transfer_amount',
+        'reserve_amount_at_close',
+        'closing_journal_entry_id',
         'difference',
         'status',
         'notes',
@@ -33,6 +37,8 @@ class PosSession extends Model
             'opening_cash' => 'decimal:4',
             'expected_cash' => 'decimal:4',
             'actual_closing_cash' => 'decimal:4',
+            'cash_transfer_amount' => 'decimal:4',
+            'reserve_amount_at_close' => 'decimal:4',
             'difference' => 'decimal:4',
         ];
     }
@@ -50,6 +56,16 @@ class PosSession extends Model
     public function treasury(): BelongsTo
     {
         return $this->belongsTo(Treasury::class);
+    }
+
+    public function closingTreasury(): BelongsTo
+    {
+        return $this->belongsTo(Treasury::class, 'closing_treasury_id');
+    }
+
+    public function closingJournalEntry(): BelongsTo
+    {
+        return $this->belongsTo(JournalEntry::class, 'closing_journal_entry_id');
     }
 
     public function sales(): HasMany

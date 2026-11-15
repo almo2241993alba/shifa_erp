@@ -22,6 +22,7 @@ class PharmacyPagesTest extends TestCase
         $cashier = User::factory()->create(['role' => 'cashier']);
 
         $this->actingAs($cashier)
+            ->withSession(['locale' => 'ar'])
             ->get('/pharmacy/cashier/reports')
             ->assertOk()
             ->assertSee('تقارير الكاشير');
@@ -50,6 +51,7 @@ class PharmacyPagesTest extends TestCase
         $branch = Branch::create(['name' => 'Main', 'code' => 'MAIN']);
 
         $this->actingAs($admin)
+            ->withSession(['locale' => 'ar'])
             ->get('/pharmacy/employees/page')
             ->assertOk()
             ->assertSee('data-wizard', false)
@@ -114,6 +116,7 @@ class PharmacyPagesTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin)
+            ->withSession(['locale' => 'ar'])
             ->get('/pharmacy/payroll')
             ->assertOk()
             ->assertSee('إنشاء مسير الراتب');

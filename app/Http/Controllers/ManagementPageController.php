@@ -14,11 +14,30 @@ class ManagementPageController extends Controller
 
         $page = $pages[$resource];
         abort_unless(in_array($request->user()->role, $page['roles'], true), 403);
+        $page = $this->translatePage($page);
+        $page['writable'] = $page['writable']
+            && in_array($request->user()->role, $page['write_roles'] ?? $page['roles'], true);
+        $page['deletable'] = $page['deletable'] ?? $page['writable'];
 
         return view('pharmacy.resource', [
             'page' => $page + ['key' => $resource],
             'currency' => Setting::query()->value('currency_code') ?: 'SDG',
         ]);
+    }
+
+    private function translatePage(array $page): array
+    {
+        foreach ($page as $key => $value) {
+            if (in_array($key, ['title', 'description', 'label'], true) && is_string($value)) {
+                $page[$key] = __($value);
+            } elseif ($key === 'options' && is_array($value)) {
+                $page[$key] = array_map(fn (string $label) => __($label), $value);
+            } elseif (is_array($value)) {
+                $page[$key] = $this->translatePage($value);
+            }
+        }
+
+        return $page;
     }
 
     private function pages(Request $request): array
@@ -191,18 +210,28 @@ class ManagementPageController extends Controller
             ],
             'treasuries' => [
                 'title' => 'الخزائن ووسائل التحصيل',
-                'description' => 'عرض الخزائن النشطة وأرصدتها المسجلة.',
+                'description' => 'إدارة وسائل التحصيل وضبط العهدة الثابتة لكل درج نقدي.',
                 'endpoint' => '/pharmacy/treasuries',
                 'roles' => ['admin', 'accountant'],
-                'writable' => false,
+                'write_roles' => ['admin'],
+                'writable' => true,
+                'deletable' => false,
                 'columns' => [
                     ['key' => 'name', 'label' => 'اسم الخزينة'],
                     ['key' => 'branch.name', 'label' => 'الفرع'],
                     ['key' => 'type', 'label' => 'النوع'],
                     ['key' => 'current_balance', 'label' => 'الرصيد', 'format' => 'money'],
+                    ['key' => 'drawer_reserve_amount', 'label' => 'العهدة الثابتة', 'format' => 'money'],
                     ['key' => 'is_active', 'label' => 'الحالة', 'format' => 'status'],
                 ],
-                'fields' => [],
+                'fields' => [
+                    ['name' => 'branch_id', 'label' => 'الفرع', 'type' => 'select', 'required' => true, 'options_endpoint' => '/pharmacy/branches?per_page=100', 'option_value' => 'id', 'option_label' => 'name'],
+                    ['name' => 'account_id', 'label' => 'الحساب المالي', 'type' => 'select', 'required' => true, 'options_endpoint' => '/pharmacy/accounts?per_page=100', 'option_value' => 'id', 'option_label' => 'name'],
+                    ['name' => 'name', 'label' => 'اسم الخزينة أو الشبكة', 'type' => 'text', 'required' => true],
+                    ['name' => 'type', 'label' => 'النوع', 'type' => 'select', 'required' => true, 'options' => ['cash_drawer' => 'درج نقدي', 'main_safe' => 'خزينة رئيسية', 'bank' => 'بنك أو شبكة']],
+                    ['name' => 'drawer_reserve_amount', 'label' => 'العهدة الثابتة للدرج', 'type' => 'number', 'min' => 0, 'step' => '0.01', 'default' => 0],
+                    ['name' => 'is_active', 'label' => 'نشط', 'type' => 'checkbox', 'default' => true],
+                ],
             ],
             'sales' => [
                 'title' => 'المبيعات',

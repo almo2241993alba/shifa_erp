@@ -161,8 +161,8 @@ class SaleService
             $this->postJournal($sale, $session, $customer, $plan?->insurer_contact_id, $payments, $costOfGoods, $setting, $user);
             $session->increment('expected_cash', $payments['cash_received']);
 
-            if ($payments['paid_amount'] > 0) {
-                Treasury::query()->whereKey($session->treasury_id)->increment('current_balance', $payments['paid_amount']);
+            foreach ($payments['settlements'] as $settlement) {
+                Treasury::query()->whereKey($settlement['treasury_id'])->increment('current_balance', $settlement['amount']);
             }
 
             return $sale->load([
@@ -392,6 +392,14 @@ class SaleService
         $credit = 0.0;
         $cashRows = [];
         $methods = [];
+        $networkTreasuries = [];
+        $drawer = Treasury::query()
+            ->whereKey($session->treasury_id)
+            ->where('branch_id', $session->branch_id)
+            ->where('type', 'cash_drawer')
+            ->where('is_active', true)
+            ->lockForUpdate()
+            ->firstOrFail();
 
         foreach ($rows as $index => $row) {
             $amount = round((float) ($row['amount'] ?? 0), 4);
@@ -406,6 +414,25 @@ class SaleService
                 $cash += $amount;
                 $cashRows[] = $index;
             } elseif ($method === 'card') {
+                $treasuryId = $row['treasury_id'] ?? null;
+                if ($treasuryId === null) {
+                    throw ValidationException::withMessages([
+                        "payments.$index.treasury_id" => 'Choose the bank or network treasury for this card payment.',
+                    ]);
+                }
+                $networkTreasury = Treasury::query()
+                    ->whereKey($treasuryId)
+                    ->where('branch_id', $session->branch_id)
+                    ->where('type', 'bank')
+                    ->where('is_active', true)
+                    ->lockForUpdate()
+                    ->first();
+                if ($networkTreasury === null) {
+                    throw ValidationException::withMessages([
+                        "payments.$index.treasury_id" => 'Select an active bank or network treasury in the session branch.',
+                    ]);
+                }
+                $networkTreasuries[$index] = $networkTreasury;
                 $card += $amount;
             } else {
                 $credit += $amount;
@@ -461,22 +488,34 @@ class SaleService
             }
         }
 
-        foreach ($rows as $row) {
+        $settlements = [];
+        foreach ($rows as $index => $row) {
             if ((float) ($row['amount'] ?? 0) <= 0) {
                 continue;
             }
 
+            $treasury = match ($row['payment_method']) {
+                'cash' => $drawer,
+                'card' => $networkTreasuries[$index],
+                default => null,
+            };
             SalePayment::query()->create([
                 'sale_id' => $sale->id,
-                'treasury_id' => $row['payment_method'] === 'credit' ? null : $session->treasury_id,
+                'treasury_id' => $treasury?->id,
                 'payment_method' => $row['payment_method'],
                 'amount' => $row['amount'],
                 'reference' => $row['reference'] ?? null,
             ]);
+            if ($treasury !== null) {
+                $settlements[$treasury->id] = [
+                    'treasury_id' => $treasury->id,
+                    'account_id' => $treasury->account_id,
+                    'amount' => round(($settlements[$treasury->id]['amount'] ?? 0) + (float) $row['amount'], 4),
+                ];
+            }
         }
 
         $paidAmount = min($patientDue, $tendered);
-        $cashReceived = min($cash, max(0, $patientDue - min($card, $patientDue)));
         $methodSet = array_values(array_unique(array_filter($methods)));
         $paymentMethod = count($methodSet) > 1
             ? 'mixed'
@@ -485,10 +524,11 @@ class SaleService
         return [
             'paid_amount' => round($paidAmount, 4),
             'change_amount' => $change,
-            'cash_received' => round($cashReceived, 4),
+            'cash_received' => round($cashApplied, 4),
             'payment_method' => $paymentMethod,
             'credit_amount' => round($credit, 4),
             'tendered_amount' => round($tendered, 4),
+            'settlements' => array_values($settlements),
         ];
     }
 
@@ -503,7 +543,9 @@ class SaleService
         User $user,
     ): void {
         $lines = [];
-        $this->addLine($lines, $session->treasury->account_id, $payment['paid_amount'], 0, 'Sale proceeds');
+        foreach ($payment['settlements'] as $settlement) {
+            $this->addLine($lines, $settlement['account_id'], $settlement['amount'], 0, 'Sale proceeds');
+        }
         if ($payment['credit_amount'] > 0) {
             $this->addLine($lines, $this->receivableAccount($customer), $payment['credit_amount'], 0, 'Customer receivable');
         }

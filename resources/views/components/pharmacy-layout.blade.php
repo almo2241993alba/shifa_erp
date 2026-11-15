@@ -4,64 +4,71 @@
     $role = auth()->user()->role;
     $groups = [
         [
-            'label' => 'مساحة العمل',
+            'label' => __('مساحة العمل'),
             'links' => [
-                ['label' => 'الرئيسية', 'route' => 'dashboard', 'icon' => 'home', 'roles' => ['admin', 'pharmacist', 'accountant', 'storekeeper']],
-                ['label' => 'نقطة البيع', 'route' => 'pharmacy.cashier', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
-                ['label' => 'تقارير الكاشير', 'route' => 'pharmacy.cashier.reports', 'icon' => 'receipt', 'roles' => ['admin', 'cashier']],
-                ['label' => 'التقارير', 'route' => 'pharmacy.reports.index', 'icon' => 'activity', 'roles' => ['admin', 'pharmacist', 'accountant']],
+                ['label' => __('الرئيسية'), 'route' => 'dashboard', 'icon' => 'home', 'roles' => ['admin', 'pharmacist', 'accountant', 'storekeeper']],
+                ['label' => __('نقطة البيع'), 'route' => 'pharmacy.cashier', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('تقارير الكاشير'), 'route' => 'pharmacy.cashier.reports', 'icon' => 'receipt', 'roles' => ['admin', 'cashier']],
+                ['label' => __('التقارير'), 'route' => 'pharmacy.reports.index', 'icon' => 'activity', 'roles' => ['admin', 'pharmacist', 'accountant']],
             ],
         ],
         [
-            'label' => 'إدارة الصيدلية',
+            'label' => __('إدارة الصيدلية'),
             'links' => [
-                ['label' => 'الأدوية والمخزون', 'resource' => 'medicines', 'icon' => 'pill', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => 'دفعات المخزون', 'resource' => 'batches', 'icon' => 'box', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => 'التصنيفات', 'resource' => 'categories', 'icon' => 'grid', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => 'وحدات القياس', 'resource' => 'units', 'icon' => 'ruler', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => 'الأشكال الدوائية', 'resource' => 'dosage-forms', 'icon' => 'layers', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => 'العملاء والموردون', 'resource' => 'contacts', 'icon' => 'users', 'roles' => ['admin', 'pharmacist', 'accountant', 'cashier']],
-                ['label' => 'وثائق التأمين', 'resource' => 'insurance-policies', 'icon' => 'shield', 'roles' => ['admin', 'pharmacist', 'accountant']],
+                ['label' => __('الأدوية والمخزون'), 'resource' => 'medicines', 'icon' => 'pill', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('دفعات المخزون'), 'resource' => 'batches', 'icon' => 'box', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('التصنيفات'), 'resource' => 'categories', 'icon' => 'grid', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('وحدات القياس'), 'resource' => 'units', 'icon' => 'ruler', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('الأشكال الدوائية'), 'resource' => 'dosage-forms', 'icon' => 'layers', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('العملاء والموردون'), 'resource' => 'contacts', 'icon' => 'users', 'roles' => ['admin', 'pharmacist', 'accountant', 'cashier']],
+                ['label' => __('وثائق التأمين'), 'resource' => 'insurance-policies', 'icon' => 'shield', 'roles' => ['admin', 'pharmacist', 'accountant']],
             ],
         ],
         [
-            'label' => 'المعاملات',
+            'label' => __('المعاملات'),
             'links' => [
-                ['label' => 'المبيعات', 'resource' => 'sales', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
-                ['label' => 'المشتريات', 'resource' => 'purchases', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
-                ['label' => 'المصروفات', 'resource' => 'expenses', 'icon' => 'wallet', 'roles' => ['admin', 'accountant', 'cashier']],
-                ['label' => 'مرتجعات المبيعات', 'resource' => 'sale-returns', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
-                ['label' => 'مرتجعات الموردين', 'resource' => 'purchase-returns', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
-                ['label' => 'جلسات الكاشير', 'resource' => 'pos-sessions', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('المبيعات'), 'resource' => 'sales', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('المشتريات'), 'resource' => 'purchases', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
+                ['label' => __('المصروفات'), 'resource' => 'expenses', 'icon' => 'wallet', 'roles' => ['admin', 'accountant', 'cashier']],
+                ['label' => __('مرتجعات المبيعات'), 'resource' => 'sale-returns', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('مرتجعات الموردين'), 'resource' => 'purchase-returns', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
+                ['label' => __('جلسات الكاشير'), 'resource' => 'pos-sessions', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
             ],
         ],
         [
-            'label' => 'المالية والتأمين',
+            'label' => __('المالية والتأمين'),
             'links' => [
-                ['label' => 'الخزائن', 'resource' => 'treasuries', 'icon' => 'safe', 'roles' => ['admin', 'accountant']],
-                ['label' => 'دليل الحسابات', 'resource' => 'accounts', 'icon' => 'book', 'roles' => ['admin']],
-                ['label' => 'مطالبات التأمين', 'resource' => 'insurance-claims', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
-                ['label' => 'خطط التأمين', 'resource' => 'insurance-plans', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
-                ['label' => 'أنواع المصروفات', 'resource' => 'expense-types', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
-                ['label' => 'القيود المحاسبية', 'resource' => 'journal-entries', 'icon' => 'ledger', 'roles' => ['admin', 'accountant']],
-                ['label' => 'الحركات المالية', 'resource' => 'financial-transactions', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
+                ['label' => __('الخزائن'), 'resource' => 'treasuries', 'icon' => 'safe', 'roles' => ['admin', 'accountant']],
+                ['label' => __('دليل الحسابات'), 'resource' => 'accounts', 'icon' => 'book', 'roles' => ['admin']],
+                ['label' => __('مطالبات التأمين'), 'resource' => 'insurance-claims', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
+                ['label' => __('خطط التأمين'), 'resource' => 'insurance-plans', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
+                ['label' => __('أنواع المصروفات'), 'resource' => 'expense-types', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
+                ['label' => __('القيود المحاسبية'), 'resource' => 'journal-entries', 'icon' => 'ledger', 'roles' => ['admin', 'accountant']],
+                ['label' => __('الحركات المالية'), 'resource' => 'financial-transactions', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
             ],
         ],
         [
-            'label' => 'الموارد البشرية',
+            'label' => __('الموارد البشرية'),
             'links' => [
-                ['label' => 'الموظفون', 'route' => 'pharmacy.employees.page', 'icon' => 'users', 'roles' => ['admin']],
-                ['label' => 'سجلات الدوام', 'resource' => 'employee-work-logs', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
-                ['label' => 'صرف الرواتب', 'route' => 'pharmacy.payroll.index', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
+                ['label' => __('الموظفون'), 'route' => 'pharmacy.employees.page', 'icon' => 'users', 'roles' => ['admin']],
+                ['label' => __('سجلات الدوام'), 'resource' => 'employee-work-logs', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
+                ['label' => __('صرف الرواتب'), 'route' => 'pharmacy.payroll.index', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
             ],
         ],
         [
-            'label' => 'إعدادات النظام',
+            'label' => __('إعدادات النظام'),
             'links' => [
-                ['label' => 'الفروع', 'resource' => 'branches', 'icon' => 'building', 'roles' => ['admin']],
-                ['label' => 'طلبات التسجيل', 'route' => 'pharmacy.registration-requests.index', 'icon' => 'users', 'roles' => ['admin']],
+                ['label' => __('الفروع'), 'resource' => 'branches', 'icon' => 'building', 'roles' => ['admin']],
+                ['label' => __('طلبات التسجيل'), 'route' => 'pharmacy.registration-requests.index', 'icon' => 'users', 'roles' => ['admin']],
             ],
         ],
+    ];
+    $roleLabels = [
+        'admin' => __('مدير النظام'),
+        'pharmacist' => __('صيدلي'),
+        'cashier' => __('كاشير'),
+        'accountant' => __('محاسب'),
+        'storekeeper' => __('أمين مخزن'),
     ];
 
     $iconPaths = [
@@ -86,18 +93,95 @@
 @endphp
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="theme-color" content="#0e2b3c">
-        <title>{{ $title }} | {{ config('app.name', 'شفاء') }}</title>
+        <title>{{ __($title) }} | {{ config('app.name', 'شفاء') }}</title>
+        @php
+            $pharmacyI18n = [
+                'locale' => app()->getLocale(),
+                'collapseSidebar' => __('تصغير القائمة'),
+                'expandSidebar' => __('توسيع القائمة'),
+                'cashNetworkRequired' => __('اختر الشبكة أو حساب التحصيل أولاً.'),
+                'requestFailed' => __('تعذر إكمال الطلب. تحقق من البيانات وحاول مرة أخرى.'),
+                'genericRequestFailed' => __('تعذر إكمال الطلب. حاول مرة أخرى.'),
+                'searchingProducts' => __('جارٍ البحث عن الأصناف...'),
+                'productCount' => __('صنف'),
+                'noMatchingProducts' => __('لم نجد أصنافًا مطابقة'),
+                'tryAnotherSearch' => __('جرّب البحث باسم آخر أو امسح الباركود.'),
+                'outOfStock' => __('نفد المخزون'),
+                'available' => __('المتاح'),
+                'pharmacyItem' => __('صنف صيدلاني'),
+                'priceNotSet' => __('السعر غير محدد'),
+                'addItem' => __('إضافة'),
+                'unitNotConfigured' => __('لم يتم إعداد وحدة بيع لهذا الصنف.'),
+                'itemAdded' => __('تمت إضافة الصنف إلى الفاتورة.'),
+                'emptyCart' => __('السلة فارغة'),
+                'addItemToStart' => __('أضف صنفًا للبدء في إعداد الفاتورة.'),
+                'removeItem' => __('حذف الصنف'),
+                'saleUnit' => __('وحدة البيع'),
+                'decreaseQuantity' => __('تقليل الكمية'),
+                'increaseQuantity' => __('زيادة الكمية'),
+                'quantity' => __('الكمية'),
+                'sessionOpened' => __('تم فتح جلسة الكاشير بنجاح.'),
+                'sessionClosed' => __('تم إغلاق الجلسة وتسوية الوردية.'),
+                'completingSale' => __('جارٍ إتمام البيع...'),
+                'completeSale' => __('تأكيد وإتمام البيع'),
+                'saleCompleted' => __('تمت الفاتورة'),
+                'loadingRecords' => __('جارٍ تحميل السجلات...'),
+                'loadingData' => __('جارٍ تحميل البيانات...'),
+                'records' => __('سجل'),
+                'page' => __('صفحة'),
+                'of' => __('من'),
+                'actions' => __('إجراءات'),
+                'yes' => __('نعم'),
+                'no' => __('لا'),
+                'active' => __('نشط'),
+                'inactive' => __('غير نشط'),
+                'completed' => __('مكتملة'),
+                'pending' => __('قيد المراجعة'),
+                'approved' => __('معتمدة'),
+                'rejected' => __('مرفوضة'),
+                'paid' => __('مدفوعة'),
+                'partial' => __('مدفوعة جزئيًا'),
+                'unpaid' => __('غير مدفوعة'),
+                'received' => __('مستلمة'),
+                'open' => __('مفتوحة'),
+                'closed' => __('مغلقة'),
+                'noRecords' => __('لا توجد سجلات مطابقة'),
+                'changeSearchOrAdd' => __('جرّب تغيير عبارة البحث أو أضف سجلًا جديدًا.'),
+                'selectValue' => __('اختر قيمة'),
+                'previous' => __('السابق'),
+                'next' => __('التالي'),
+                'edit' => __('تعديل'),
+                'delete' => __('حذف'),
+                'editRecord' => __('تعديل البيانات'),
+                'newRecord' => __('إضافة سجل جديد'),
+                'recordDetails' => __('بيانات السجل'),
+                'addRecord' => __('إضافة سجل'),
+                'saveChanges' => __('حفظ البيانات'),
+                'couldNotLoad' => __('تعذر تحميل البيانات'),
+                'deleteConfirm' => __('هل تريد حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء.'),
+                'deleted' => __('تم حذف السجل بنجاح.'),
+                'saving' => __('جارٍ الحفظ...'),
+                'updated' => __('تم تحديث السجل بنجاح.'),
+                'created' => __('تمت إضافة السجل بنجاح.'),
+                'typeCashDrawer' => __('درج نقدي'),
+                'typeMainSafe' => __('خزينة رئيسية'),
+                'typeBank' => __('بنك أو شبكة'),
+            ];
+        @endphp
+        <script>
+            window.pharmacyI18n = @json($pharmacyI18n);
+        </script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
         <div class="pharmacy-shell">
-            <button class="sidebar-backdrop" type="button" aria-label="إغلاق القائمة" data-sidebar-close></button>
+            <button class="sidebar-backdrop" type="button" aria-label="{{ __('إغلاق القائمة') }}" data-sidebar-close></button>
             <aside class="pharmacy-sidebar" id="pharmacy-sidebar">
                 <a class="brand-lockup" href="{{ route('dashboard') }}">
                     <span class="brand-mark" aria-hidden="true">
@@ -107,27 +191,34 @@
                     </span>
                     <span class="brand-copy">
                         <strong>{{ config('app.name', 'شفاء') }}</strong>
-                        <small>نظام إدارة الصيدلية</small>
+                        <small>{{ __('نظام إدارة الصيدلية') }}</small>
                     </span>
                 </a>
 
                 <div class="sidebar-branch">
                     <span class="branch-pulse"></span>
-                    <span>
-                        <small>الموقع الحالي</small>
-                        <strong>{{ auth()->user()->branch?->name ?? 'الإدارة المركزية' }}</strong>
+                    <span class="branch-copy">
+                        <small>{{ __('الموقع الحالي') }}</small>
+                        <strong>{{ auth()->user()->branch?->name ?? __('الإدارة المركزية') }}</strong>
                     </span>
                     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
-                <nav class="sidebar-nav" aria-label="التنقل الرئيسي">
+                <nav class="sidebar-nav" aria-label="{{ __('التنقل الرئيسي') }}">
                     @foreach ($groups as $group)
                         @php
                             $visibleLinks = collect($group['links'])->filter(fn ($link) => in_array($role, $link['roles'], true));
+                            $groupIsActive = $visibleLinks->contains(fn ($link) => isset($link['route'])
+                                ? request()->routeIs($link['route'])
+                                : request()->routeIs('pharmacy.manage') && request()->route('resource') === $link['resource']);
                         @endphp
                         @if ($visibleLinks->isNotEmpty())
-                            <div class="nav-group">
-                                <div class="nav-group-label">{{ $group['label'] }}</div>
+                            <div class="nav-group {{ $groupIsActive ? 'is-open' : '' }}" data-sidebar-group>
+                                <button class="nav-group-toggle" type="button" data-sidebar-group-toggle aria-expanded="{{ $groupIsActive ? 'true' : 'false' }}" aria-controls="sidebar-group-{{ $loop->index }}" title="{{ $group['label'] }}">
+                                    <span class="nav-group-label">{{ $group['label'] }}</span>
+                                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                                <div class="nav-group-links" id="sidebar-group-{{ $loop->index }}">
                                 @foreach ($visibleLinks as $link)
                                     @php
                                         $isActive = isset($link['route'])
@@ -137,7 +228,7 @@
                                             ? route($link['route'])
                                             : route('pharmacy.manage', $link['resource']);
                                     @endphp
-                                    <a class="sidebar-link {{ $isActive ? 'is-active' : '' }}" href="{{ $href }}" @if ($isActive) aria-current="page" @endif>
+                                    <a class="sidebar-link {{ $isActive ? 'is-active' : '' }}" href="{{ $href }}" title="{{ $link['label'] }}" aria-label="{{ $link['label'] }}" @if ($isActive) aria-current="page" @endif>
                                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                             <path d="{{ $iconPaths[$link['icon']] }}" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
@@ -145,6 +236,7 @@
                                         @if ($isActive)<span class="nav-active-dot"></span>@endif
                                     </a>
                                 @endforeach
+                                </div>
                             </div>
                         @endif
                     @endforeach
@@ -154,43 +246,58 @@
                     <div class="support-card">
                         <span class="support-icon">✦</span>
                         <div>
-                            <strong>مساعدة سريعة</strong>
-                            <small>النظام جاهز لمساعدتك</small>
+                            <strong>{{ __('مساعدة سريعة') }}</strong>
+                            <small>{{ __('النظام جاهز لمساعدتك') }}</small>
                         </div>
                     </div>
-                    <div class="sidebar-version">شفاء <span>•</span> إصدار النظام</div>
+                    <div class="sidebar-version">شفاء <span>•</span> {{ __('إصدار النظام') }}</div>
                 </div>
             </aside>
 
             <div class="pharmacy-main">
                 <header class="pharmacy-topbar">
                     <div class="topbar-leading">
-                        <button class="icon-button mobile-menu-button" type="button" aria-label="فتح القائمة" aria-controls="pharmacy-sidebar" aria-expanded="false" data-sidebar-toggle>
+                        <button class="icon-button mobile-menu-button" type="button" aria-label="{{ __('فتح القائمة') }}" aria-controls="pharmacy-sidebar" aria-expanded="false" data-sidebar-toggle>
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                         </button>
+                        <button class="icon-button sidebar-collapse-button" type="button" aria-label="{{ __('تصغير القائمة') }}" aria-controls="pharmacy-sidebar" aria-pressed="false" data-sidebar-collapse-toggle title="{{ __('تصغير القائمة') }}">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M9 5v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                        </button>
                         <div class="topbar-title">
-                            <span class="topbar-eyebrow">نظام شفاء للصيدليات</span>
-                            <h1>{{ $title }}</h1>
+                            <span class="topbar-eyebrow">{{ __('نظام شفاء للصيدليات') }}</span>
+                            <h1>{{ __($title) }}</h1>
                         </div>
                     </div>
                     <div class="topbar-actions">
                         <div class="topbar-date">
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13H4V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                            <span>{{ now()->locale('ar')->translatedFormat('j F Y') }}</span>
+                            <span>{{ now()->locale(app()->getLocale())->translatedFormat('j F Y') }}</span>
                         </div>
-                        <a class="topbar-quick-link" href="{{ route('profile') }}">حسابي</a>
-                        <div class="user-menu">
-                            <span class="user-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
-                            <span class="user-copy">
-                                <strong>{{ auth()->user()->name }}</strong>
-                                <small>{{ ['admin' => 'مدير النظام', 'pharmacist' => 'صيدلي', 'cashier' => 'كاشير', 'accountant' => 'محاسب', 'storekeeper' => 'أمين مخزن'][auth()->user()->role] ?? 'مستخدم' }}</small>
-                            </span>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button class="logout-button" type="submit" aria-label="تسجيل الخروج" title="تسجيل الخروج">
-                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                </button>
-                            </form>
+                        <form class="locale-switch" method="POST" action="{{ route('locale.switch') }}">
+                            @csrf
+                            <input type="hidden" name="return_to" value="{{ request()->getRequestUri() }}">
+                            <label class="sr-only" for="locale-switch-select">{{ __('اللغة') }}</label>
+                            <select id="locale-switch-select" name="locale" aria-label="{{ __('اللغة') }}" onchange="this.form.submit()">
+                                <option value="ar" @selected(app()->getLocale() === 'ar')>{{ __('العربية') }}</option>
+                                <option value="en" @selected(app()->getLocale() === 'en')>English</option>
+                            </select>
+                        </form>
+                        <div class="user-menu" data-user-menu>
+                            <button class="user-menu-toggle" type="button" data-user-menu-toggle aria-expanded="false" aria-haspopup="true">
+                                <span class="user-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                                <span class="user-copy">
+                                    <strong>{{ auth()->user()->name }}</strong>
+                                    <small>{{ $roleLabels[auth()->user()->role] ?? __('مستخدم') }}</small>
+                                </span>
+                                <svg class="user-menu-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="user-menu-panel" data-user-menu-panel hidden>
+                                <a href="{{ route('profile') }}">{{ __('حسابي') }}</a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit">{{ __('تسجيل الخروج') }}</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -200,7 +307,7 @@
                 </main>
                 <footer class="pharmacy-footer">
                     <span>© {{ now()->year }} {{ config('app.name', 'شفاء') }}</span>
-                    <span>صحة أفضل، بإدارة أدق</span>
+                    <span>{{ __('صحة أفضل، بإدارة أدق') }}</span>
                 </footer>
             </div>
         </div>

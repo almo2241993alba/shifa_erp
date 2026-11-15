@@ -95,12 +95,45 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .sidebar-nav { flex: 1; }
 .nav-group { margin: 0 0 17px; }
+.nav-group-toggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #7f9aa6;
+    display: flex;
+    font-size: 10px;
+    font-weight: 700;
+    justify-content: space-between;
+    letter-spacing: .45px;
+    margin: 0 0 5px;
+    padding: 5px 11px;
+    text-align: start;
+    transition: color .18s ease;
+    width: 100%;
+}
+.nav-group-toggle:hover { color: #d7e5e8; }
+.nav-group-toggle svg { flex: 0 0 15px; height: 15px; transition: transform .22s ease; width: 15px; }
+.nav-group.is-open .nav-group-toggle svg { transform: rotate(180deg); }
 .nav-group-label {
     color: #7f9aa6;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: .45px;
-    margin: 0 11px 7px;
+    margin: 0;
+}
+.nav-group-links {
+    max-height: 480px;
+    overflow: hidden;
+    transition: max-height .26s ease, opacity .2s ease;
+}
+.nav-group:not(.is-open) .nav-group-links { max-height: 0; opacity: .35; }
+.nav-group:not(.is-open) .nav-group-toggle svg { transform: rotate(0); }
+.nav-group.is-open .nav-group-toggle svg { transform: rotate(180deg); }
+.nav-group-toggle[aria-expanded="false"] svg { transform: rotate(0); }
+.nav-group-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.nav-group-toggle:focus-visible { outline: 2px solid #63d4bb; outline-offset: 2px; }
+.nav-group-toggle .nav-group-label {
+    color: inherit;
 }
 .sidebar-link {
     align-items: center;
@@ -148,7 +181,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .sidebar-version { color: #7f9aa6; font-size: 9px; margin: 13px 10px 0; }
 .sidebar-version span { color: #46c7a8; padding: 0 3px; }
 
-.pharmacy-main { margin-inline-start: 270px; min-height: 100vh; }
+.pharmacy-main { margin-inline-start: 270px; min-height: 100vh; transition: margin-inline-start .24s ease; }
 .pharmacy-topbar {
     align-items: center;
     background: rgba(255,255,255,.93);
@@ -192,6 +225,85 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .logout-button svg, .icon-button svg { height: 18px; width: 18px; }
 .icon-button { font-size: 23px; }
 .mobile-menu-button { display: none; }
+.sidebar-collapse-button { color: #6f838d; }
+.locale-switch select {
+    appearance: none;
+    background: #f7fafb;
+    border: 1px solid #e6edef;
+    border-radius: 9px;
+    color: #405762;
+    cursor: pointer;
+    font-size: 10px;
+    min-height: 34px;
+    padding: 0 11px;
+}
+.user-menu { position: relative; }
+.user-menu-toggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    display: flex;
+    gap: 9px;
+    padding: 0;
+    text-align: start;
+}
+.user-menu-toggle:focus-visible { border-radius: 9px; }
+.user-menu-chevron { color: #82939b; height: 15px; transition: transform .2s ease; width: 15px; }
+.user-menu.is-open .user-menu-chevron { transform: rotate(180deg); }
+.user-menu-panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    box-shadow: 0 12px 30px rgba(22,49,64,.13);
+    min-width: 175px;
+    padding: 6px;
+    position: absolute;
+    inset-inline-end: 0;
+    top: calc(100% + 13px);
+    z-index: 60;
+}
+.user-menu-panel a, .user-menu-panel button {
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+    color: #526873;
+    display: block;
+    font-size: 11px;
+    padding: 10px 11px;
+    text-align: start;
+    width: 100%;
+}
+.user-menu-panel a:hover, .user-menu-panel button:hover { background: #f1f7f6; color: var(--teal); }
+.user-menu-panel form { margin: 0; }
+.sr-only {
+    clip: rect(0,0,0,0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+body.sidebar-collapsed .pharmacy-sidebar { width: 82px; padding-inline: 12px; }
+body.sidebar-collapsed .pharmacy-main { margin-inline-start: 82px; }
+body.sidebar-collapsed .brand-lockup { justify-content: center; margin-inline: 0; }
+body.sidebar-collapsed .brand-copy,
+body.sidebar-collapsed .branch-copy,
+body.sidebar-collapsed .sidebar-branch > svg,
+body.sidebar-collapsed .nav-group-label,
+body.sidebar-collapsed .nav-group-toggle svg,
+body.sidebar-collapsed .sidebar-link > span:not(.nav-active-dot),
+body.sidebar-collapsed .support-card > div,
+body.sidebar-collapsed .sidebar-version { opacity: 0; pointer-events: none; width: 0; }
+body.sidebar-collapsed .sidebar-branch { justify-content: center; padding-inline: 0; }
+body.sidebar-collapsed .nav-group-toggle { justify-content: center; min-height: 28px; padding-inline: 0; }
+body.sidebar-collapsed .nav-group-links { max-height: 480px; opacity: 1; }
+body.sidebar-collapsed .sidebar-link { justify-content: center; padding-inline: 0; }
+body.sidebar-collapsed .sidebar-link.is-active::before { inset-inline-start: -12px; }
+body.sidebar-collapsed .nav-active-dot { position: absolute; inset-inline-end: 5px; top: 8px; }
+body.sidebar-collapsed .support-card { justify-content: center; padding: 8px; }
+body.sidebar-collapsed .sidebar-collapse-button svg { transform: rotate(180deg); }
 
 .pharmacy-content { margin: 0 auto; max-width: 1600px; padding: 28px clamp(20px, 3vw, 46px) 36px; }
 .pharmacy-footer { color: #9aa8ae; display: flex; font-size: 10px; justify-content: space-between; margin: 0 auto; max-width: 1600px; padding: 0 clamp(20px, 3vw, 46px) 22px; }
@@ -511,6 +623,37 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .quote-error { background: #fff2ef; border-radius: 7px; color: #b9584b; font-size: 8px; line-height: 1.7; padding: 8px; }
 .session-modal { max-width: 450px; }
 .session-modal .field-label { margin-top: 13px; }
+.session-close-summary {
+    background: #f5faf9;
+    border: 1px solid #e5f1ee;
+    border-radius: 9px;
+    display: grid;
+    gap: 8px;
+    margin: 14px 0 4px;
+    padding: 12px;
+}
+.session-close-summary > div { align-items: center; display: flex; font-size: 9px; justify-content: space-between; gap: 12px; }
+.session-close-summary span { color: #788b91; }
+.session-close-summary strong { color: #26574f; font-size: 10px; white-space: nowrap; }
+.profile-page { display: grid; gap: 15px; }
+.profile-page .profile-section { padding: 22px; }
+.profile-page .profile-section > section > header { margin-bottom: 15px; }
+.profile-page .profile-section h2 { color: #243d48; font-size: 15px; font-weight: 750; margin: 0; }
+.profile-page .profile-section p { color: #7d8d94; font-size: 10px; line-height: 1.8; margin: 6px 0 0; }
+.profile-page .profile-section form { display: grid; gap: 11px; }
+.profile-page .profile-section form > div { max-width: 620px; }
+.profile-page .profile-section input:not([type="checkbox"]) {
+    background: #fbfcfc;
+    border: 1px solid #e1e9eb;
+    border-radius: 8px;
+    color: #354c56;
+    font-size: 11px;
+    min-height: 39px;
+    padding: 8px 10px;
+    width: 100%;
+}
+.profile-page .profile-section label { color: #536871; font-size: 10px; font-weight: 700; }
+.profile-page .profile-section button { font-size: 10px; }
 
 .sidebar-backdrop { background: rgba(7,28,39,.46); border: 0; display: none; inset: 0; opacity: 0; position: fixed; transition: opacity .2s ease; z-index: 35; }
 
@@ -522,13 +665,28 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 @media (max-width: 900px) {
-    .pharmacy-sidebar { box-shadow: 12px 0 35px rgba(8,31,43,.16); inset-inline-start: auto; inset-inline-end: 0; transform: translateX(105%); transition: transform .24s ease; width: min(290px, 84vw); }
-    html[dir="rtl"] .pharmacy-sidebar { transform: translateX(105%); }
+    .pharmacy-sidebar { box-shadow: 12px 0 35px rgba(8,31,43,.16); inset-inline-start: 0; inset-inline-end: auto; transform: translateX(-105%); transition: transform .24s ease; width: min(290px, 84vw); }
+    html[dir="rtl"] .pharmacy-sidebar { inset-inline-start: auto; inset-inline-end: 0; transform: translateX(105%); }
     .pharmacy-sidebar.sidebar-open { transform: translateX(0); }
     .sidebar-backdrop { display: block; pointer-events: none; }
     body.sidebar-visible .sidebar-backdrop { opacity: 1; pointer-events: auto; }
     .pharmacy-main { margin-inline-start: 0; }
     .mobile-menu-button { display: inline-flex; }
+    .sidebar-collapse-button { display: none; }
+    body.sidebar-collapsed .pharmacy-sidebar { padding: 26px 18px 18px; width: min(290px, 84vw); }
+    body.sidebar-collapsed .brand-lockup { justify-content: flex-start; margin: 0 8px 26px; }
+    body.sidebar-collapsed .brand-copy,
+    body.sidebar-collapsed .branch-copy,
+    body.sidebar-collapsed .sidebar-branch > svg,
+    body.sidebar-collapsed .nav-group-label,
+    body.sidebar-collapsed .nav-group-toggle svg,
+    body.sidebar-collapsed .sidebar-link > span:not(.nav-active-dot),
+    body.sidebar-collapsed .support-card > div,
+    body.sidebar-collapsed .sidebar-version { opacity: 1; pointer-events: auto; width: auto; }
+    body.sidebar-collapsed .sidebar-branch { justify-content: flex-start; padding: 11px 12px; }
+    body.sidebar-collapsed .nav-group-toggle { justify-content: space-between; padding: 5px 11px; }
+    body.sidebar-collapsed .sidebar-link { justify-content: flex-start; padding: 8px 11px; }
+    body.sidebar-collapsed .support-card { justify-content: flex-start; padding: 12px; }
     .pharmacy-topbar { height: 70px; }
     .dashboard-grid, .dashboard-bottom-grid { grid-template-columns: 1fr; }
     .cashier-layout { grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); }
@@ -539,10 +697,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     .pharmacy-topbar { height: 64px; padding: 0 15px; }
     .topbar-leading { gap: 8px; }
     .topbar-title h1 { font-size: 14px; }
-    .topbar-eyebrow, .topbar-date, .topbar-quick-link, .user-copy { display: none; }
+    .topbar-eyebrow, .topbar-date, .user-copy { display: none; }
     .topbar-actions { gap: 8px; }
     .user-menu { border: 0; gap: 4px; padding-inline-start: 0; }
     .user-avatar { height: 33px; width: 33px; }
+    .locale-switch select { font-size: 9px; min-height: 31px; padding-inline: 7px; }
     .pharmacy-content { padding: 18px 14px 26px; }
     .pharmacy-footer { font-size: 8px; padding: 0 15px 16px; }
     .welcome-banner { align-items: flex-start; flex-direction: column; gap: 17px; min-height: 190px; padding: 21px; }

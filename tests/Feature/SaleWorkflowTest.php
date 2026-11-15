@@ -13,6 +13,7 @@ use App\Models\JournalEntry;
 use App\Models\Medicine;
 use App\Models\MedicineUnit;
 use App\Models\PosSession;
+use App\Models\SalePayment;
 use App\Models\Treasury;
 use App\Models\Unit;
 use App\Models\User;
@@ -36,7 +37,7 @@ class SaleWorkflowTest extends TestCase
         $user = User::query()->where('role', 'admin')->firstOrFail();
         $user->forceFill(['email_verified_at' => now()])->save();
         $branch = $user->branch;
-        $treasury = Treasury::query()->where('branch_id', $branch->id)->firstOrFail();
+        $treasury = Treasury::query()->where('branch_id', $branch->id)->where('type', 'cash_drawer')->firstOrFail();
         $category = Category::query()->firstOrFail();
         $dosageForm = DosageForm::query()->firstOrFail();
         $unit = Unit::query()->firstOrFail();
@@ -160,5 +161,77 @@ class SaleWorkflowTest extends TestCase
         foreach (JournalEntry::query()->get() as $journalEntry) {
             $this->assertSame((float) $journalEntry->total_debit, (float) $journalEntry->total_credit);
         }
+    }
+
+    public function test_card_payment_is_credited_to_its_selected_network_not_the_cash_drawer(): void
+    {
+            $user = User::query()->where('role', 'admin')->firstOrFail();
+            $user->forceFill(['email_verified_at' => now()])->save();
+            $branch = $user->branch;
+            $drawer = Treasury::query()->where('branch_id', $branch->id)->where('type', 'cash_drawer')->firstOrFail();
+            $network = Treasury::query()->where('branch_id', $branch->id)->where('type', 'bank')->firstOrFail();
+            \App\Models\Setting::query()->firstOrFail()->update(['tax_rate' => 0]);
+
+            $medicine = Medicine::query()->create([
+                'category_id' => Category::query()->firstOrFail()->id,
+                'dosage_form_id' => DosageForm::query()->firstOrFail()->id,
+                'trade_name' => 'Network payment medicine',
+                'item_type' => 'medicine',
+                'dispensing_method' => 'FEFO',
+                'is_taxable' => true,
+                'is_active' => true,
+            ]);
+            $unit = Unit::query()->firstOrFail();
+            MedicineUnit::query()->create([
+                'medicine_id' => $medicine->id,
+                'unit_id' => $unit->id,
+                'conversion_factor' => 1,
+                'selling_price' => 100,
+                'is_base_unit' => true,
+                'is_purchasable' => true,
+                'is_sellable' => true,
+            ]);
+            Batch::query()->create([
+                'branch_id' => $branch->id,
+                'medicine_id' => $medicine->id,
+                'batch_number' => 'NET-001',
+                'expiry_date' => today()->addYear(),
+                'received_date' => today(),
+                'initial_quantity_base' => 5,
+                'remaining_quantity_base' => 5,
+                'unit_purchase_price' => 20,
+                'landed_cost_price' => 20,
+                'is_active' => true,
+            ]);
+            $session = PosSession::query()->create([
+                'branch_id' => $branch->id,
+                'user_id' => $user->id,
+                'treasury_id' => $drawer->id,
+                'opened_at' => now(),
+                'opening_cash' => 0,
+                'expected_cash' => 0,
+                'status' => 'open',
+            ]);
+
+            $response = $this->actingAs($user)->postJson('/pharmacy/sales', [
+                'pos_session_id' => $session->id,
+                'items' => [['medicine_id' => $medicine->id, 'unit_id' => $unit->id, 'quantity' => 1]],
+                'payments' => [[
+                    'payment_method' => 'card',
+                    'amount' => 100,
+                    'treasury_id' => $network->id,
+                ]],
+            ])->assertCreated();
+
+            $this->assertDatabaseHas('sale_payments', [
+                'sale_id' => $response->json('data.id'),
+                'treasury_id' => $network->id,
+                'payment_method' => 'card',
+                'amount' => '100.0000',
+            ]);
+            $this->assertSame(100.0, (float) $network->refresh()->current_balance);
+            $this->assertSame(0.0, (float) $drawer->refresh()->current_balance);
+            $this->assertSame(0.0, (float) $session->refresh()->expected_cash);
+            $this->assertSame(100.0, (float) SalePayment::query()->where('payment_method', 'card')->sum('amount'));
     }
 }

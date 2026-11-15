@@ -42,7 +42,7 @@ class DashboardController extends Controller
             $date = $today->copy()->subDays($daysAgo);
 
             return [
-                'label' => $date->locale('ar')->translatedFormat('D'),
+                'label' => $date->locale(app()->getLocale())->translatedFormat('D'),
                 'date' => $date->toDateString(),
                 'total' => (float) ($weeklySales[$date->toDateString()] ?? 0),
             ];
@@ -112,7 +112,9 @@ class DashboardController extends Controller
             'chartMax' => $maxChartValue,
             'pendingClaims' => $pendingClaims,
             'currency' => Setting::query()->value('currency_code') ?: 'SDG',
-            'todayLabel' => Carbon::now()->locale('ar')->translatedFormat('l، j F Y'),
+            'todayLabel' => Carbon::now()->locale(app()->getLocale())->translatedFormat(
+                app()->getLocale() === 'ar' ? 'l، j F Y' : 'l, F j, Y',
+            ),
         ]);
     }
 

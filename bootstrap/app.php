@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\EnsureRole;
+use App\Http\Middleware\SetLocale;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [SetLocale::class]);
         $middleware->alias([
             'active' => EnsureActiveUser::class,
             'role' => EnsureRole::class,

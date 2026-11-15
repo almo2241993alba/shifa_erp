@@ -14,6 +14,7 @@ class Treasury extends Model
         'name',
         'type',
         'current_balance',
+        'drawer_reserve_amount',
         'is_active',
     ];
 
@@ -21,6 +22,7 @@ class Treasury extends Model
     {
         return [
             'current_balance' => 'decimal:4',
+            'drawer_reserve_amount' => 'decimal:4',
             'is_active' => 'boolean',
         ];
     }
