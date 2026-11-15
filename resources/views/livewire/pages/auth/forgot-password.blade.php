@@ -1,5 +1,7 @@
 <?php
 
+use App\Notifications\PasswordResetRequested;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -30,32 +32,30 @@ new #[Layout('layouts.guest')] class extends Component
             return;
         }
 
+        Notification::route('mail', config('app.general_manager_email'))
+            ->notify(new PasswordResetRequested($this->email));
+
         $this->reset('email');
 
-        session()->flash('status', __($status));
+        session()->flash('status', 'أرسلنا رابط إعادة التعيين إلى بريدك، وأبلغنا المدير العام بطلبك.');
     }
 }; ?>
 
-<div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<div class="auth-form-content">
+    <span class="eyebrow">استعادة الحساب</span>
+    <h2>نسيت كلمة المرور؟</h2>
+    <p class="auth-form-description">أدخل بريد حسابك. سنرسل لك رابطاً آمناً لإعادة تعيين كلمة المرور، ونبلغ المدير العام بطلب الاستعادة.</p>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="auth-status-message" :status="session('status')" />
 
-    <form wire:submit="sendPasswordResetLink">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <form wire:submit="sendPasswordResetLink" class="auth-form">
+        <div class="auth-field">
+            <label class="field-label" for="email">البريد الإلكتروني</label>
+            <x-text-input wire:model="email" id="email" class="auth-input" type="email" name="email" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="auth-field-error" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <button class="button button-primary auth-submit" type="submit">إرسال رابط الاستعادة</button>
+        <a class="auth-inline-link" href="{{ route('login') }}" wire:navigate>العودة إلى تسجيل الدخول</a>
     </form>
 </div>

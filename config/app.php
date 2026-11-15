@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'شفاء'),
 
+    'general_manager_email' => env('GENERAL_MANAGER_EMAIL', 'admin@shifa.com'),
+
     'initial_admin_password' => env('ADMIN_INITIAL_PASSWORD'),
 
     'initial_cashier_password' => env('CASHIER_INITIAL_PASSWORD'),

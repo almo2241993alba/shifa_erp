@@ -1,0 +1,53 @@
+# مرجع مشروع شفاء
+
+هذا الملف هو نقطة البداية لفهم المشروع قبل أي مهمة لاحقة. راجعه أولاً، ثم افتح الملفات المرتبطة مباشرة بالمطلوب فقط؛ لا حاجة لإعادة قراءة المشروع كاملاً. حدّث هذا المرجع عند تغيير البنية أو تدفقات العمل.
+
+## التقنية والبنية
+
+- Laravel 12 وPHP 8.2 أو أحدث.
+- واجهات Blade وLivewire 3/Volt، مع CSS مخصص وTailwind عبر Vite. Bootstrap غير مستخدم؛ حافظ على واجهة Tailwind الموحدة ولا تضف إطاراً ثانياً دون طلب صريح.
+- قاعدة البيانات الافتراضية محلية MySQL في `.env`؛ لا تقرأ أو تنسخ أسرار البيئة إلى هذا الملف.
+- `routes/web.php`: صفحات التطبيق ومجموعات صلاحيات الأدوار.
+- `routes/auth.php`: الدخول والتسجيل والتحقق والبريد الخاص بكلمة المرور.
+- `app/Http/Controllers`: صفحات التطبيق وواجهات JSON.
+- `app/Services/Pharmacy`: منطق الأعمال والمعاملات المالية.
+- `resources/views/pharmacy`: صفحات مساحة العمل.
+- `resources/views/components/pharmacy-layout.blade.php`: التخطيط الموحد والقائمة الجانبية.
+- `resources/css/app.css` و`resources/js/app.js`: التنسيق وسلوك المتصفح.
+
+## قواعد التطوير
+
+1. استخدم middleware المصادقة والتحقق من الحساب النشط والدور كما في المسارات الموجودة.
+2. اربط استعلامات البيانات بفرع المستخدم. الاستثناء للمستخدم `admin` فقط، وبصلاحية واضحة.
+3. التحقق النهائي يكون في Laravel؛ يمكن إضافة تحقق HTML5/JavaScript لسهولة الاستخدام، لكنه لا يستبدل تحقق الخادم.
+4. استخدم `x-pharmacy-layout` للصفحات الداخلية، وأساليب التصميم الموجودة بدل إضافة إطار CSS جديد.
+5. حافظ على رسائل وأسماء الحقول العربية واتجاه RTL.
+6. قبل التنفيذ راجع هذا الملف ثم الملفات المباشرة ذات الصلة، وبعد التنفيذ حدّث هذا الملف إذا تغيرت طريقة العمل.
+
+## تدفقات وملفات مهمة
+
+- تسجيل الدخول: `resources/views/livewire/pages/auth/login.blade.php` و`app/Livewire/Forms/LoginForm.php`.
+- التسجيل واستعادة كلمة المرور وإعادة التعيين: `routes/auth.php` و`resources/views/livewire/pages/auth/`.
+- لوحة الإدارة: `DashboardController` و`resources/views/pharmacy/dashboard.blade.php`.
+- نقطة البيع: `CashierPageController` و`resources/views/pharmacy/cashier.blade.php` و`resources/js/cashier.js`.
+- الصفحات العامة للموارد: `ManagementPageController` و`resources/views/pharmacy/resource.blade.php` و`resources/js/management.js`.
+- الموظفون: `EmployeeController` و`Employee` و`Contact`.
+- الرواتب: `SalarySlipController` و`SalarySlipService` و`SalarySlip`.
+- مكونات التنقل والصلاحيات: `resources/views/components/pharmacy-layout.blade.php` و`routes/web.php`.
+
+## اتجاهات تجربة الاستخدام المتفق عليها
+
+- إظهار/إخفاء كلمة المرور في نماذج الدخول ذات الصلة.
+- عند طلب الاستعادة، يظل رابط إعادة التعيين الآمن موجهاً إلى صاحب الحساب، ويرسل إشعار منفصل للمدير العام دون إرسال كلمة مرور أو رمز إعادة التعيين إليه.
+- التسجيل العام لا يمنح صلاحية فعالة مباشرة؛ تُنشأ الحسابات كطلبات معلقة إلى حين اعتماد المدير من صفحة طلبات التسجيل.
+- صفحات التقارير مفصولة بحسب الدور والفرع؛ تقارير الكاشير لا تعرض إلا مبيعات المستخدم نفسه.
+- صفحات الموظفين والرواتب تستخدم تحقق Laravel وتكامل التخطيط الحالي. يمكن استخدام خطوات Wizard لتحسين النماذج الطويلة.
+- بريد المدير العام قابل للضبط عبر `GENERAL_MANAGER_EMAIL`؛ الإرسال الفعلي يتطلب إعداد Mail transport في `.env` (الإعداد الافتراضي يسجل الرسائل محلياً).
+- صفحات المبيعات: `/pharmacy/reports` للإدارة والمحاسبة والصيدلي، و`/pharmacy/cashier/reports` للكاشير.
+- الموارد البشرية: `/pharmacy/employees/page` لإنشاء الموظف ومراجعته، و`/pharmacy/payroll` لإنشاء مسير واستخدام `SalarySlipService`.
+
+## التحقق
+
+- اختبارات Laravel: `php artisan test`.
+- بناء الواجهة: `npm run build`.
+- عند تغيير المصادقة أو التسجيل أو صلاحيات الصفحات، أضف اختبارات Feature للحالات المسموح بها والممنوعة.

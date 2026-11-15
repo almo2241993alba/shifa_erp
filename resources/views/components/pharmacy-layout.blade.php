@@ -8,6 +8,8 @@
             'links' => [
                 ['label' => 'الرئيسية', 'route' => 'dashboard', 'icon' => 'home', 'roles' => ['admin', 'pharmacist', 'accountant', 'storekeeper']],
                 ['label' => 'نقطة البيع', 'route' => 'pharmacy.cashier', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => 'تقارير الكاشير', 'route' => 'pharmacy.cashier.reports', 'icon' => 'receipt', 'roles' => ['admin', 'cashier']],
+                ['label' => 'التقارير', 'route' => 'pharmacy.reports.index', 'icon' => 'activity', 'roles' => ['admin', 'pharmacist', 'accountant']],
             ],
         ],
         [
@@ -48,15 +50,16 @@
         [
             'label' => 'الموارد البشرية',
             'links' => [
-                ['label' => 'الموظفون', 'resource' => 'employees', 'icon' => 'users', 'roles' => ['admin']],
+                ['label' => 'الموظفون', 'route' => 'pharmacy.employees.page', 'icon' => 'users', 'roles' => ['admin']],
                 ['label' => 'سجلات الدوام', 'resource' => 'employee-work-logs', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
-                ['label' => 'مسيرات الرواتب', 'resource' => 'salary-slips', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
+                ['label' => 'صرف الرواتب', 'route' => 'pharmacy.payroll.index', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
             ],
         ],
         [
             'label' => 'إعدادات النظام',
             'links' => [
                 ['label' => 'الفروع', 'resource' => 'branches', 'icon' => 'building', 'roles' => ['admin']],
+                ['label' => 'طلبات التسجيل', 'route' => 'pharmacy.registration-requests.index', 'icon' => 'users', 'roles' => ['admin']],
             ],
         ],
     ];

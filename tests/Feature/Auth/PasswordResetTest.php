@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Notifications\PasswordResetRequested;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -25,6 +26,7 @@ class PasswordResetTest extends TestCase
     public function test_reset_password_link_can_be_requested(): void
     {
         Notification::fake();
+        config(['app.general_manager_email' => 'manager@example.com']);
 
         $user = User::factory()->create();
 
@@ -33,6 +35,10 @@ class PasswordResetTest extends TestCase
             ->call('sendPasswordResetLink');
 
         Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentOnDemand(
+            PasswordResetRequested::class,
+            fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'manager@example.com',
+        );
     }
 
     public function test_reset_password_screen_can_be_rendered(): void

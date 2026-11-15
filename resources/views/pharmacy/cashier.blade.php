@@ -23,6 +23,7 @@
                 <p>ابحث عن الصنف، أضفه إلى الفاتورة، ثم أكمل عملية التحصيل.</p>
             </div>
             <div class="cashier-session-controls">
+                <a class="button button-secondary" href="{{ route('pharmacy.cashier.reports') }}">تقارير الكاشير</a>
                 <span class="session-status {{ $openSession ? 'session-open' : 'session-closed' }}">
                     <i></i>{{ $openSession ? 'الجلسة مفتوحة' : 'لا توجد جلسة مفتوحة' }}
                 </span>

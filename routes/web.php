@@ -10,6 +10,7 @@ use App\Http\Controllers\ContactPhoneController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosageFormController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeePageController;
 use App\Http\Controllers\EmployeeWorkLogController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseTypeController;
@@ -23,9 +24,12 @@ use App\Http\Controllers\ManagementPageController;
 use App\Http\Controllers\MedicineAccessoryController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicineUnitController;
+use App\Http\Controllers\PayrollPageController;
 use App\Http\Controllers\PosSessionController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseReturnController;
+use App\Http\Controllers\RegistrationRequestController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalarySlipController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SaleReturnController;
@@ -57,11 +61,33 @@ Route::middleware(['auth', 'verified', 'active'])
         Route::get('cashier/products', [CashierPageController::class, 'products'])
             ->middleware('role:admin,pharmacist,cashier')
             ->name('cashier.products');
+        Route::get('cashier/reports', [ReportsController::class, 'cashier'])
+            ->middleware('role:admin,cashier')
+            ->name('cashier.reports');
+        Route::get('reports', [ReportsController::class, 'index'])
+            ->middleware('role:admin,pharmacist,accountant')
+            ->name('reports.index');
+        Route::get('employees/page', [EmployeePageController::class, 'index'])
+            ->middleware('role:admin')
+            ->name('employees.page');
+        Route::post('employees/page', [EmployeePageController::class, 'store'])
+            ->middleware('role:admin')
+            ->name('employees.store-page');
+        Route::get('payroll', [PayrollPageController::class, 'index'])
+            ->middleware('role:admin,accountant')
+            ->name('payroll.index');
+        Route::post('payroll', [PayrollPageController::class, 'store'])
+            ->middleware('role:admin,accountant')
+            ->name('payroll.store');
         Route::get('manage/{resource}', [ManagementPageController::class, 'show'])
             ->middleware('role:admin,pharmacist,cashier,accountant,storekeeper')
             ->name('manage');
 
         Route::middleware('role:admin')->group(function (): void {
+            Route::get('registration-requests', [RegistrationRequestController::class, 'index'])
+                ->name('registration-requests.index');
+            Route::post('registration-requests/{user}/approve', [RegistrationRequestController::class, 'approve'])
+                ->name('registration-requests.approve');
             Route::apiResource('branches', BranchController::class);
             Route::apiResource('accounts', AccountController::class);
             Route::apiResource('employees', EmployeeController::class);

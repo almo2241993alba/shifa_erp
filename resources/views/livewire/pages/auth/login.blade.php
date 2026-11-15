@@ -23,6 +23,10 @@ new #[Layout('layouts.guest')] class extends Component
     <h2>تسجيل الدخول</h2>
     <p class="auth-form-description">سجّل الدخول للمتابعة إلى مساحة عمل الصيدلية.</p>
 
+    @if (session('registration_pending'))
+        <div class="auth-status-message" role="status">تم استلام طلب التسجيل. سيصبح الحساب متاحًا بعد مراجعة المدير العام والموافقة عليه.</div>
+    @endif
+
     <x-auth-session-status class="auth-status-message" :status="session('status')" />
 
     <form wire:submit="login" class="auth-form">
@@ -39,7 +43,12 @@ new #[Layout('layouts.guest')] class extends Component
                     <a class="auth-inline-link" href="{{ route('password.request') }}" wire:navigate>نسيت كلمة المرور؟</a>
                 @endif
             </div>
-            <x-text-input wire:model="form.password" id="password" class="auth-input" type="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور" />
+            <div class="auth-password-control">
+                <x-text-input wire:model="form.password" id="password" class="auth-input" type="password" name="password" required autocomplete="current-password" placeholder="أدخل كلمة المرور" />
+                <button class="password-toggle" type="button" aria-label="إظهار كلمة المرور" aria-controls="password" aria-pressed="false" data-password-toggle>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
+                </button>
+            </div>
             <x-input-error :messages="$errors->get('form.password')" class="auth-field-error" />
         </div>
 
