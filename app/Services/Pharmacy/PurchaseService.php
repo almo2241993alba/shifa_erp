@@ -39,9 +39,11 @@ class PurchaseService
             }
 
             $supplier = Contact::query()->findOrFail($data['supplier_id']);
-            if (! $supplier->is_active || ! $supplier->is_supplier) {
+            if (! $supplier->is_active
+                || ! $supplier->is_supplier
+                || (int) $supplier->branch_id !== $branchId) {
                 throw ValidationException::withMessages([
-                    'supplier_id' => 'The selected contact is not an active supplier.',
+                    'supplier_id' => 'The selected contact is not an active supplier in the purchase branch.',
                 ]);
             }
 

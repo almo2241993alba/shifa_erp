@@ -13,6 +13,7 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SaleReturn;
 use App\Models\SaleReturnItem;
+use App\Models\SaleReturnPayment;
 use App\Models\Setting;
 use App\Models\Treasury;
 use App\Models\User;
@@ -38,6 +39,8 @@ class SaleReturnService
                 ->firstOrFail();
             $treasury = Treasury::query()
                 ->whereKey($session->treasury_id)
+                ->where('branch_id', $session->branch_id)
+                ->where('type', 'cash_drawer')
                 ->where('is_active', true)
                 ->lockForUpdate()
                 ->firstOrFail();
@@ -52,19 +55,9 @@ class SaleReturnService
             $insuranceRefund = round(array_sum(array_column($refundItems, 'insurance_refund')), 4);
             $taxRefund = round(array_sum(array_column($refundItems, 'tax_refund')), 4);
             $grossRefund = round(array_sum(array_column($refundItems, 'gross_refund')), 4);
-            $previousPatientRefund = (float) $sale->returns()->sum('patient_refund_amount');
-            $availablePaid = round((float) $sale->paid_amount - $previousPatientRefund, 4);
-
-            if ($patientRefund > $availablePaid) {
-                throw ValidationException::withMessages([
-                    'items' => 'A cash refund cannot exceed the amount previously collected from the patient.',
-                ]);
-            }
-            if ((float) $treasury->current_balance < $patientRefund) {
-                throw ValidationException::withMessages([
-                    'treasury_id' => 'The session treasury does not have enough balance for this refund.',
-                ]);
-            }
+            $refundPayments = $this->allocatePatientRefund($sale, $session, $patientRefund);
+            $refundTreasuries = $this->lockRefundTreasuries($refundPayments, $session, $treasury);
+            $this->assertRefundBalances($refundPayments, $refundTreasuries);
 
             $claim = $sale->insuranceClaim;
             if ($insuranceRefund > 0) {
@@ -94,6 +87,15 @@ class SaleReturnService
                 'tax_refund_amount' => $taxRefund,
                 'reason' => $data['reason'],
             ]);
+
+            foreach ($refundPayments as $refundPayment) {
+                SaleReturnPayment::query()->create([
+                    'sale_return_id' => $return->id,
+                    'sale_payment_id' => $refundPayment['sale_payment']->id,
+                    'treasury_id' => $refundPayment['treasury_id'],
+                    'amount' => $refundPayment['amount'],
+                ]);
+            }
 
             $costReturned = 0.0;
             foreach ($refundItems as $item) {
@@ -126,12 +128,18 @@ class SaleReturnService
                 $sale->decrement('insurance_due', $insuranceRefund);
             }
 
-            if ($patientRefund > 0) {
-                $treasury->decrement('current_balance', $patientRefund);
-                $session->decrement('expected_cash', $patientRefund);
+            $cashRefund = 0.0;
+            foreach ($refundPayments as $refundPayment) {
+                $refundTreasuries[$refundPayment['treasury_id']]->decrement('current_balance', $refundPayment['amount']);
+                if ($refundPayment['sale_payment']->payment_method === 'cash') {
+                    $cashRefund += $refundPayment['amount'];
+                }
+            }
+            if ($cashRefund > 0) {
+                $session->decrement('expected_cash', $cashRefund);
             }
 
-            $this->postJournal($return, $sale, $treasury, $claim, $costReturned, $taxRefund, $user);
+            $this->postJournal($return, $refundPayments, $refundTreasuries, $claim, $costReturned, $taxRefund, $user);
             $soldQuantity = (int) SaleItem::query()->where('sale_id', $sale->id)->sum('quantity');
             $returnedQuantity = (int) $sale->returns()->with('items')->get()->sum(
                 fn (SaleReturn $saleReturn) => $saleReturn->items->sum('returned_quantity'),
@@ -140,8 +148,125 @@ class SaleReturnService
                 'status' => $returnedQuantity >= $soldQuantity ? 'returned' : 'partially_returned',
             ])->save();
 
-            return $return->load(['items.medicine', 'items.batch', 'sale', 'posSession', 'treasury']);
+            return $return->load([
+                'items.medicine',
+                'items.batch',
+                'sale',
+                'posSession',
+                'treasury',
+                'payments.salePayment',
+                'payments.treasury',
+            ]);
         });
+    }
+
+    private function allocatePatientRefund(Sale $sale, PosSession $session, float $patientRefund): array
+    {
+        if ($patientRefund <= 0) {
+            return [];
+        }
+
+        $payments = $sale->payments()
+            ->whereIn('payment_method', ['cash', 'card'])
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+        $availablePayments = [];
+        $totalAvailable = 0.0;
+
+        foreach ($payments as $payment) {
+            $available = round((float) $payment->amount - (float) $payment->returnPayments()->sum('amount'), 4);
+            if ($available > 0) {
+                $availablePayments[] = ['sale_payment' => $payment, 'available' => $available];
+                $totalAvailable = round($totalAvailable + $available, 4);
+            }
+        }
+
+        if ($patientRefund > $totalAvailable) {
+            throw ValidationException::withMessages([
+                'items' => 'A refund cannot exceed the original cash and card payments that have not already been refunded.',
+            ]);
+        }
+
+        $remainingRefund = $patientRefund;
+        $remainingAvailable = $totalAvailable;
+        $allocations = [];
+
+        foreach ($availablePayments as $index => $availablePayment) {
+            $payment = $availablePayment['sale_payment'];
+            $available = $availablePayment['available'];
+            $amount = $index === array_key_last($availablePayments)
+                ? min($available, $remainingRefund)
+                : min($available, round($remainingRefund * $available / $remainingAvailable, 4));
+            $remainingAvailable = round($remainingAvailable - $available, 4);
+            if ($amount <= 0) {
+                continue;
+            }
+            if ($payment->payment_method === 'card' && $payment->treasury_id === null) {
+                throw ValidationException::withMessages([
+                    'sale_id' => 'The original card payment has no recorded bank treasury.',
+                ]);
+            }
+
+            $allocations[] = [
+                'sale_payment' => $payment,
+                'treasury_id' => $payment->payment_method === 'cash'
+                    ? $session->treasury_id
+                    : (int) $payment->treasury_id,
+                'amount' => $amount,
+            ];
+            $remainingRefund = round($remainingRefund - $amount, 4);
+        }
+
+        if ($remainingRefund > 0) {
+            throw ValidationException::withMessages([
+                'items' => 'The refund could not be allocated across the original payment methods.',
+            ]);
+        }
+
+        return $allocations;
+    }
+
+    private function lockRefundTreasuries(array $refundPayments, PosSession $session, Treasury $drawer): array
+    {
+        $treasuries = [$drawer->id => $drawer];
+        $cardTreasuryIds = collect($refundPayments)
+            ->filter(fn (array $payment) => $payment['sale_payment']->payment_method === 'card')
+            ->pluck('treasury_id')
+            ->unique()
+            ->sort()
+            ->values();
+
+        foreach ($cardTreasuryIds as $treasuryId) {
+            $treasuries[$treasuryId] = Treasury::query()
+                ->whereKey($treasuryId)
+                ->where('branch_id', $session->branch_id)
+                ->where('type', 'bank')
+                ->lockForUpdate()
+                ->firstOrFail();
+        }
+
+        return $treasuries;
+    }
+
+    private function assertRefundBalances(array $refundPayments, array $treasuries): void
+    {
+        $refundsByTreasury = [];
+        foreach ($refundPayments as $refundPayment) {
+            $treasuryId = $refundPayment['treasury_id'];
+            $refundsByTreasury[$treasuryId] = round(
+                ($refundsByTreasury[$treasuryId] ?? 0) + $refundPayment['amount'],
+                4,
+            );
+        }
+
+        foreach ($refundsByTreasury as $treasuryId => $amount) {
+            if ((float) $treasuries[$treasuryId]->current_balance < $amount) {
+                throw ValidationException::withMessages([
+                    'treasury_id' => 'The refund treasury does not have enough balance for this refund.',
+                ]);
+            }
+        }
     }
 
     private function prepareReturnItems(Sale $sale, array $requestedItems): array
@@ -188,8 +313,8 @@ class SaleReturnService
 
     private function postJournal(
         SaleReturn $return,
-        Sale $sale,
-        Treasury $treasury,
+        array $refundPayments,
+        array $refundTreasuries,
         ?InsuranceClaim $claim,
         float $costReturned,
         float $taxRefund,
@@ -214,8 +339,16 @@ class SaleReturnService
             }
             $this->addLine($lines, $settings->vat_payable_account_id, $taxRefund, 0, 'Output VAT reversal');
         }
-        if ((float) $return->patient_refund_amount > 0) {
-            $this->addLine($lines, $treasury->account_id, 0, (float) $return->patient_refund_amount, 'Patient refund');
+        foreach ($refundPayments as $refundPayment) {
+            $treasury = $refundTreasuries[$refundPayment['treasury_id']];
+            $method = $refundPayment['sale_payment']->payment_method;
+            $this->addLine(
+                $lines,
+                $treasury->account_id,
+                0,
+                $refundPayment['amount'],
+                $method === 'cash' ? 'Patient cash refund' : 'Patient card refund',
+            );
         }
         if ((float) $return->insurance_refund_amount > 0 && $claim !== null) {
             $insurer = Contact::query()->findOrFail($claim->insurer_contact_id);

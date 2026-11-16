@@ -72,6 +72,11 @@ class SaleReturn extends Model
         return $this->hasMany(SaleReturnItem::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(SaleReturnPayment::class);
+    }
+
     public function medicines(): BelongsToMany
     {
         return $this->belongsToMany(Medicine::class, 'sale_return_items')

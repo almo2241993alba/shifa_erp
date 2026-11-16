@@ -2,10 +2,10 @@
 
 namespace App\Services\Pharmacy;
 
-use App\Models\PosSession;
 use App\Models\FinancialTransaction;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
+use App\Models\PosSession;
 use App\Models\Treasury;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +17,7 @@ class PosSessionService
     public function open(User $user, int $treasuryId, float $openingCash, ?int $branchId = null, ?string $notes = null): PosSession
     {
         return DB::transaction(function () use ($user, $treasuryId, $openingCash, $branchId, $notes): PosSession {
+            $user = User::query()->lockForUpdate()->findOrFail($user->id);
             $branchId ??= $user->branch_id;
             if ($branchId === null) {
                 throw ValidationException::withMessages([
@@ -71,8 +72,7 @@ class PosSessionService
         float $actualCash,
         int $closingTreasuryId,
         ?string $notes = null,
-    ): PosSession
-    {
+    ): PosSession {
         return DB::transaction(function () use ($session, $user, $actualCash, $closingTreasuryId, $notes): PosSession {
             $session = PosSession::query()->lockForUpdate()->findOrFail($session->id);
 

@@ -17,7 +17,7 @@ class SaleReturnController extends Controller
         $validated = $request->validate([
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
-        $query = SaleReturn::query()->with(['sale', 'user', 'items.medicine']);
+        $query = SaleReturn::query()->with(['sale', 'user', 'items.medicine', 'payments.salePayment', 'payments.treasury']);
         $this->scopeBranch($query, $request);
         $returns = $query
             ->latest()
@@ -54,7 +54,17 @@ class SaleReturnController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $query = SaleReturn::query()->with(['sale', 'user', 'posSession', 'treasury', 'items.saleItem', 'items.medicine', 'items.batch']);
+        $query = SaleReturn::query()->with([
+            'sale',
+            'user',
+            'posSession',
+            'treasury',
+            'items.saleItem',
+            'items.medicine',
+            'items.batch',
+            'payments.salePayment',
+            'payments.treasury',
+        ]);
         $this->scopeBranch($query, request());
         $return = $query->findOrFail($id);
 

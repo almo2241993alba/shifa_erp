@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SalePayment extends Model
 {
@@ -30,5 +31,10 @@ class SalePayment extends Model
     public function treasury(): BelongsTo
     {
         return $this->belongsTo(Treasury::class);
+    }
+
+    public function returnPayments(): HasMany
+    {
+        return $this->hasMany(SaleReturnPayment::class);
     }
 }

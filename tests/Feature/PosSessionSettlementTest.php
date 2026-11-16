@@ -42,6 +42,26 @@ class PosSessionSettlementTest extends TestCase
         $this->assertSame(80.0, (float) $drawer->refresh()->current_balance);
     }
 
+    public function test_user_cannot_open_a_second_session_while_one_is_active(): void
+    {
+        $user = User::query()->where('role', 'admin')->firstOrFail();
+        $user->forceFill(['email_verified_at' => now()])->save();
+        $drawer = Treasury::query()->where('branch_id', $user->branch_id)->where('type', 'cash_drawer')->firstOrFail();
+
+        $this->actingAs($user)->postJson('/pharmacy/pos-sessions/open', [
+            'treasury_id' => $drawer->id,
+            'opening_cash' => 80,
+        ])->assertCreated();
+
+        $this->postJson('/pharmacy/pos-sessions/open', [
+            'treasury_id' => $drawer->id,
+            'opening_cash' => 120,
+        ])->assertUnprocessable()->assertJsonValidationErrors('pos_session');
+
+        $this->assertDatabaseCount('pos_sessions', 1);
+        $this->assertSame(80.0, (float) $drawer->refresh()->current_balance);
+    }
+
     public function test_closing_transfers_cash_above_the_drawer_reserve_to_the_main_safe_with_a_balanced_entry(): void
     {
         $user = User::query()->where('role', 'admin')->firstOrFail();

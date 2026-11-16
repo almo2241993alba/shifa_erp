@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Batch;
+use App\Models\Branch;
 use App\Models\Category;
 use App\Models\Contact;
 use App\Models\DosageForm;
@@ -11,7 +12,6 @@ use App\Models\Medicine;
 use App\Models\MedicineUnit;
 use App\Models\Purchase;
 use App\Models\PurchaseReturn;
-use App\Models\Treasury;
 use App\Models\Unit;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
@@ -101,5 +101,47 @@ class PurchaseWorkflowTest extends TestCase
         foreach (JournalEntry::query()->get() as $entry) {
             $this->assertSame((float) $entry->total_debit, (float) $entry->total_credit);
         }
+    }
+
+    public function test_purchase_rejects_a_supplier_from_another_branch(): void
+    {
+        $user = User::query()->where('role', 'admin')->firstOrFail();
+        $user->forceFill(['email_verified_at' => now()])->save();
+        $otherBranch = Branch::query()->create([
+            'name' => 'Other branch',
+            'code' => 'BR-002',
+            'is_active' => true,
+        ]);
+        $supplier = Contact::query()->create([
+            'branch_id' => $otherBranch->id,
+            'name' => 'Cross-branch supplier',
+            'is_supplier' => true,
+            'is_active' => true,
+        ]);
+        $medicine = Medicine::query()->create([
+            'category_id' => Category::query()->firstOrFail()->id,
+            'dosage_form_id' => DosageForm::query()->firstOrFail()->id,
+            'trade_name' => 'Cross-branch purchase test medicine',
+            'item_type' => 'medicine',
+            'dispensing_method' => 'FEFO',
+            'is_taxable' => false,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($user)->postJson('/pharmacy/purchases', [
+            'supplier_id' => $supplier->id,
+            'purchase_date' => today()->toDateString(),
+            'received_date' => today()->toDateString(),
+            'items' => [[
+                'medicine_id' => $medicine->id,
+                'unit_id' => Unit::query()->firstOrFail()->id,
+                'quantity' => 1,
+                'unit_purchase_price' => 10,
+                'batch_number' => 'CROSS-BRANCH-001',
+                'expiry_date' => today()->addYear()->toDateString(),
+            ]],
+        ])->assertUnprocessable()->assertJsonValidationErrors('supplier_id');
+
+        $this->assertDatabaseCount('purchases', 0);
     }
 }
