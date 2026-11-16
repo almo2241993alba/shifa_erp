@@ -39,13 +39,13 @@ class ReportsController extends Controller
 
         if ($toDate->lt($fromDate)) {
             throw ValidationException::withMessages([
-                'to_date' => __('يجب أن يكون تاريخ النهاية مساوياً لتاريخ البداية أو بعده.'),
+                'to_date' => __('The end date must be on or after the start date.'),
             ]);
         }
 
         if ($fromDate->diffInDays($toDate) > 366) {
             throw ValidationException::withMessages([
-                'to_date' => __('اختر فترة لا تتجاوز سنة واحدة.'),
+                'to_date' => __('Choose a date range of no more than one year.'),
             ]);
         }
 
@@ -123,7 +123,7 @@ class ReportsController extends Controller
             ->first();
 
         return view('pharmacy.reports', [
-            'title' => $cashierReport ? __('تقارير الكاشير') : __('تقارير المبيعات'),
+            'title' => $cashierReport ? __('Cashier reports') : __('Sales reports'),
             'isCashierReport' => $cashierReport,
             'fromDate' => $from,
             'toDate' => $to,

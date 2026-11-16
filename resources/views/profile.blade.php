@@ -1,7 +1,7 @@
 <x-pharmacy-layout :title="__('Profile')">
     <section class="page-intro profile-intro">
         <div>
-            <span class="eyebrow">{{ __('ملف الحساب') }}</span>
+            <span class="eyebrow">{{ __('Account profile') }}</span>
             <h2>{{ __('Profile') }}</h2>
             <p>{{ __('Manage your personal information, password, and account settings.') }}</p>
         </div>

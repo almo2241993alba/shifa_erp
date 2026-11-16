@@ -37,25 +37,25 @@ new #[Layout('layouts.guest')] class extends Component
 
         $this->reset('email');
 
-        session()->flash('status', 'أرسلنا رابط إعادة التعيين إلى بريدك، وأبلغنا المدير العام بطلبك.');
+        session()->flash('status', __('We sent a reset link to your email and notified the general manager.'));
     }
 }; ?>
 
 <div class="auth-form-content">
-    <span class="eyebrow">استعادة الحساب</span>
-    <h2>نسيت كلمة المرور؟</h2>
-    <p class="auth-form-description">أدخل بريد حسابك. سنرسل لك رابطاً آمناً لإعادة تعيين كلمة المرور، ونبلغ المدير العام بطلب الاستعادة.</p>
+    <span class="eyebrow">{{ __('Account recovery') }}</span>
+    <h2>{{ __('Forgot your password?') }}</h2>
+    <p class="auth-form-description">{{ __('Enter your account email. We will send a secure password reset link and notify the general manager.') }}</p>
 
     <x-auth-session-status class="auth-status-message" :status="session('status')" />
 
     <form wire:submit="sendPasswordResetLink" class="auth-form">
         <div class="auth-field">
-            <label class="field-label" for="email">البريد الإلكتروني</label>
+            <label class="field-label" for="email">{{ __('Email') }}</label>
             <x-text-input wire:model="email" id="email" class="auth-input" type="email" name="email" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="auth-field-error" />
         </div>
 
-        <button class="button button-primary auth-submit" type="submit">إرسال رابط الاستعادة</button>
-        <a class="auth-inline-link" href="{{ route('login') }}" wire:navigate>العودة إلى تسجيل الدخول</a>
+        <button class="button button-primary auth-submit" type="submit">{{ __('Send reset link') }}</button>
+        <a class="auth-inline-link" href="{{ route('login') }}" wire:navigate>{{ __('Back to sign in') }}</a>
     </form>
 </div>

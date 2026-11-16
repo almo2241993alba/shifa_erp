@@ -1,74 +1,75 @@
-@props(['title' => 'لوحة الإدارة'])
+@props(['title' => __('Management dashboard')])
 
 @php
+    $appName = config('app.name') === 'شفاء' ? __('Shifa') : config('app.name');
     $role = auth()->user()->role;
     $groups = [
         [
-            'label' => __('مساحة العمل'),
+            'label' => __('Workspace'),
             'links' => [
-                ['label' => __('الرئيسية'), 'route' => 'dashboard', 'icon' => 'home', 'roles' => ['admin', 'pharmacist', 'accountant', 'storekeeper']],
-                ['label' => __('نقطة البيع'), 'route' => 'pharmacy.cashier', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
-                ['label' => __('تقارير الكاشير'), 'route' => 'pharmacy.cashier.reports', 'icon' => 'receipt', 'roles' => ['admin', 'cashier']],
-                ['label' => __('التقارير'), 'route' => 'pharmacy.reports.index', 'icon' => 'activity', 'roles' => ['admin', 'pharmacist', 'accountant']],
+                ['label' => __('Home'), 'route' => 'dashboard', 'icon' => 'home', 'roles' => ['admin', 'pharmacist', 'accountant', 'storekeeper']],
+                ['label' => __('Point of sale'), 'route' => 'pharmacy.cashier', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('Cashier reports'), 'route' => 'pharmacy.cashier.reports', 'icon' => 'receipt', 'roles' => ['admin', 'cashier']],
+                ['label' => __('Reports'), 'route' => 'pharmacy.reports.index', 'icon' => 'activity', 'roles' => ['admin', 'pharmacist', 'accountant']],
             ],
         ],
         [
-            'label' => __('إدارة الصيدلية'),
+            'label' => __('Pharmacy management'),
             'links' => [
-                ['label' => __('الأدوية والمخزون'), 'resource' => 'medicines', 'icon' => 'pill', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => __('دفعات المخزون'), 'resource' => 'batches', 'icon' => 'box', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => __('التصنيفات'), 'resource' => 'categories', 'icon' => 'grid', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => __('وحدات القياس'), 'resource' => 'units', 'icon' => 'ruler', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => __('الأشكال الدوائية'), 'resource' => 'dosage-forms', 'icon' => 'layers', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
-                ['label' => __('العملاء والموردون'), 'resource' => 'contacts', 'icon' => 'users', 'roles' => ['admin', 'pharmacist', 'accountant', 'cashier']],
-                ['label' => __('وثائق التأمين'), 'resource' => 'insurance-policies', 'icon' => 'shield', 'roles' => ['admin', 'pharmacist', 'accountant']],
+                ['label' => __('Medicines and inventory'), 'resource' => 'medicines', 'icon' => 'pill', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('Inventory batches'), 'resource' => 'batches', 'icon' => 'box', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('Categories'), 'resource' => 'categories', 'icon' => 'grid', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('Units'), 'resource' => 'units', 'icon' => 'ruler', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('Dosage forms'), 'resource' => 'dosage-forms', 'icon' => 'layers', 'roles' => ['admin', 'pharmacist', 'storekeeper']],
+                ['label' => __('Customers and suppliers'), 'resource' => 'contacts', 'icon' => 'users', 'roles' => ['admin', 'pharmacist', 'accountant', 'cashier']],
+                ['label' => __('Insurance policies'), 'resource' => 'insurance-policies', 'icon' => 'shield', 'roles' => ['admin', 'pharmacist', 'accountant']],
             ],
         ],
         [
-            'label' => __('المعاملات'),
+            'label' => __('Transactions'),
             'links' => [
-                ['label' => __('المبيعات'), 'resource' => 'sales', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
-                ['label' => __('المشتريات'), 'resource' => 'purchases', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
-                ['label' => __('المصروفات'), 'resource' => 'expenses', 'icon' => 'wallet', 'roles' => ['admin', 'accountant', 'cashier']],
-                ['label' => __('مرتجعات المبيعات'), 'resource' => 'sale-returns', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
-                ['label' => __('مرتجعات الموردين'), 'resource' => 'purchase-returns', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
-                ['label' => __('جلسات الكاشير'), 'resource' => 'pos-sessions', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('Sales'), 'resource' => 'sales', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('Purchases'), 'resource' => 'purchases', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
+                ['label' => __('Expenses'), 'resource' => 'expenses', 'icon' => 'wallet', 'roles' => ['admin', 'accountant', 'cashier']],
+                ['label' => __('Sales returns'), 'resource' => 'sale-returns', 'icon' => 'receipt', 'roles' => ['admin', 'pharmacist', 'cashier']],
+                ['label' => __('Purchase returns'), 'resource' => 'purchase-returns', 'icon' => 'cart', 'roles' => ['admin', 'storekeeper', 'accountant']],
+                ['label' => __('Cashier sessions'), 'resource' => 'pos-sessions', 'icon' => 'pos', 'roles' => ['admin', 'pharmacist', 'cashier']],
             ],
         ],
         [
-            'label' => __('المالية والتأمين'),
+            'label' => __('Finance and insurance'),
             'links' => [
-                ['label' => __('الخزائن'), 'resource' => 'treasuries', 'icon' => 'safe', 'roles' => ['admin', 'accountant']],
-                ['label' => __('دليل الحسابات'), 'resource' => 'accounts', 'icon' => 'book', 'roles' => ['admin']],
-                ['label' => __('مطالبات التأمين'), 'resource' => 'insurance-claims', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
-                ['label' => __('خطط التأمين'), 'resource' => 'insurance-plans', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
-                ['label' => __('أنواع المصروفات'), 'resource' => 'expense-types', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
-                ['label' => __('القيود المحاسبية'), 'resource' => 'journal-entries', 'icon' => 'ledger', 'roles' => ['admin', 'accountant']],
-                ['label' => __('الحركات المالية'), 'resource' => 'financial-transactions', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Treasuries'), 'resource' => 'treasuries', 'icon' => 'safe', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Chart of accounts'), 'resource' => 'accounts', 'icon' => 'book', 'roles' => ['admin']],
+                ['label' => __('Insurance claims'), 'resource' => 'insurance-claims', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Insurance plans'), 'resource' => 'insurance-plans', 'icon' => 'shield', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Expense types'), 'resource' => 'expense-types', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Journal entries'), 'resource' => 'journal-entries', 'icon' => 'ledger', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Financial transactions'), 'resource' => 'financial-transactions', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
             ],
         ],
         [
-            'label' => __('الموارد البشرية'),
+            'label' => __('Human resources'),
             'links' => [
-                ['label' => __('الموظفون'), 'route' => 'pharmacy.employees.page', 'icon' => 'users', 'roles' => ['admin']],
-                ['label' => __('سجلات الدوام'), 'resource' => 'employee-work-logs', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
-                ['label' => __('صرف الرواتب'), 'route' => 'pharmacy.payroll.index', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Employees'), 'route' => 'pharmacy.employees.page', 'icon' => 'users', 'roles' => ['admin']],
+                ['label' => __('Work logs'), 'resource' => 'employee-work-logs', 'icon' => 'activity', 'roles' => ['admin', 'accountant']],
+                ['label' => __('Payroll'), 'route' => 'pharmacy.payroll.index', 'icon' => 'wallet', 'roles' => ['admin', 'accountant']],
             ],
         ],
         [
-            'label' => __('إعدادات النظام'),
+            'label' => __('System settings'),
             'links' => [
-                ['label' => __('الفروع'), 'resource' => 'branches', 'icon' => 'building', 'roles' => ['admin']],
-                ['label' => __('طلبات التسجيل'), 'route' => 'pharmacy.registration-requests.index', 'icon' => 'users', 'roles' => ['admin']],
+                ['label' => __('Branches'), 'resource' => 'branches', 'icon' => 'building', 'roles' => ['admin']],
+                ['label' => __('Registration requests'), 'route' => 'pharmacy.registration-requests.index', 'icon' => 'users', 'roles' => ['admin']],
             ],
         ],
     ];
     $roleLabels = [
-        'admin' => __('مدير النظام'),
-        'pharmacist' => __('صيدلي'),
-        'cashier' => __('كاشير'),
-        'accountant' => __('محاسب'),
-        'storekeeper' => __('أمين مخزن'),
+        'admin' => __('Administrator'),
+        'pharmacist' => __('Pharmacist'),
+        'cashier' => __('Cashier'),
+        'accountant' => __('Accountant'),
+        'storekeeper' => __('Storekeeper'),
     ];
 
     $iconPaths = [
@@ -99,79 +100,79 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="theme-color" content="#0e2b3c">
-        <title>{{ __($title) }} | {{ config('app.name', 'شفاء') }}</title>
+        <title>{{ __($title) }} | {{ $appName }}</title>
         @php
             $pharmacyI18n = [
                 'locale' => app()->getLocale(),
-                'collapseSidebar' => __('تصغير القائمة'),
-                'expandSidebar' => __('توسيع القائمة'),
-                'cashNetworkRequired' => __('اختر الشبكة أو حساب التحصيل أولاً.'),
-                'requestFailed' => __('تعذر إكمال الطلب. تحقق من البيانات وحاول مرة أخرى.'),
-                'genericRequestFailed' => __('تعذر إكمال الطلب. حاول مرة أخرى.'),
-                'searchingProducts' => __('جارٍ البحث عن الأصناف...'),
-                'productCount' => __('صنف'),
-                'noMatchingProducts' => __('لم نجد أصنافًا مطابقة'),
-                'tryAnotherSearch' => __('جرّب البحث باسم آخر أو امسح الباركود.'),
-                'outOfStock' => __('نفد المخزون'),
-                'available' => __('المتاح'),
-                'pharmacyItem' => __('صنف صيدلاني'),
-                'priceNotSet' => __('السعر غير محدد'),
-                'addItem' => __('إضافة'),
-                'unitNotConfigured' => __('لم يتم إعداد وحدة بيع لهذا الصنف.'),
-                'itemAdded' => __('تمت إضافة الصنف إلى الفاتورة.'),
-                'emptyCart' => __('السلة فارغة'),
-                'addItemToStart' => __('أضف صنفًا للبدء في إعداد الفاتورة.'),
-                'removeItem' => __('حذف الصنف'),
-                'saleUnit' => __('وحدة البيع'),
-                'decreaseQuantity' => __('تقليل الكمية'),
-                'increaseQuantity' => __('زيادة الكمية'),
-                'quantity' => __('الكمية'),
-                'sessionOpened' => __('تم فتح جلسة الكاشير بنجاح.'),
-                'sessionClosed' => __('تم إغلاق الجلسة وتسوية الوردية.'),
-                'completingSale' => __('جارٍ إتمام البيع...'),
-                'completeSale' => __('تأكيد وإتمام البيع'),
-                'saleCompleted' => __('تمت الفاتورة'),
-                'loadingRecords' => __('جارٍ تحميل السجلات...'),
-                'loadingData' => __('جارٍ تحميل البيانات...'),
-                'records' => __('سجل'),
-                'page' => __('صفحة'),
-                'of' => __('من'),
-                'actions' => __('إجراءات'),
-                'yes' => __('نعم'),
-                'no' => __('لا'),
-                'active' => __('نشط'),
-                'inactive' => __('غير نشط'),
-                'completed' => __('مكتملة'),
-                'pending' => __('قيد المراجعة'),
-                'approved' => __('معتمدة'),
-                'rejected' => __('مرفوضة'),
-                'paid' => __('مدفوعة'),
-                'partial' => __('مدفوعة جزئيًا'),
-                'unpaid' => __('غير مدفوعة'),
-                'received' => __('مستلمة'),
-                'open' => __('مفتوحة'),
-                'closed' => __('مغلقة'),
-                'noRecords' => __('لا توجد سجلات مطابقة'),
-                'changeSearchOrAdd' => __('جرّب تغيير عبارة البحث أو أضف سجلًا جديدًا.'),
-                'selectValue' => __('اختر قيمة'),
-                'previous' => __('السابق'),
-                'next' => __('التالي'),
-                'edit' => __('تعديل'),
-                'delete' => __('حذف'),
-                'editRecord' => __('تعديل البيانات'),
-                'newRecord' => __('إضافة سجل جديد'),
-                'recordDetails' => __('بيانات السجل'),
-                'addRecord' => __('إضافة سجل'),
-                'saveChanges' => __('حفظ البيانات'),
-                'couldNotLoad' => __('تعذر تحميل البيانات'),
-                'deleteConfirm' => __('هل تريد حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء.'),
-                'deleted' => __('تم حذف السجل بنجاح.'),
-                'saving' => __('جارٍ الحفظ...'),
-                'updated' => __('تم تحديث السجل بنجاح.'),
-                'created' => __('تمت إضافة السجل بنجاح.'),
-                'typeCashDrawer' => __('درج نقدي'),
-                'typeMainSafe' => __('خزينة رئيسية'),
-                'typeBank' => __('بنك أو شبكة'),
+                'collapseSidebar' => __('Collapse sidebar'),
+                'expandSidebar' => __('Expand sidebar'),
+                'cashNetworkRequired' => __('Select a network or settlement account first.'),
+                'requestFailed' => __('Could not complete the request. Check the data and try again.'),
+                'genericRequestFailed' => __('Could not complete the request. Try again.'),
+                'searchingProducts' => __('Searching products...'),
+                'productCount' => __('items'),
+                'noMatchingProducts' => __('No matching products'),
+                'tryAnotherSearch' => __('Try another search or scan a barcode.'),
+                'outOfStock' => __('Out of stock'),
+                'available' => __('Available'),
+                'pharmacyItem' => __('Pharmacy item'),
+                'priceNotSet' => __('Price not set'),
+                'addItem' => __('Add'),
+                'unitNotConfigured' => __('No selling unit is configured for this item.'),
+                'itemAdded' => __('Item added to the invoice.'),
+                'emptyCart' => __('The cart is empty'),
+                'addItemToStart' => __('Add an item to start building the invoice.'),
+                'removeItem' => __('Remove item'),
+                'saleUnit' => __('Selling unit'),
+                'decreaseQuantity' => __('Decrease quantity'),
+                'increaseQuantity' => __('Increase quantity'),
+                'quantity' => __('Quantity'),
+                'sessionOpened' => __('Cashier session opened.'),
+                'sessionClosed' => __('Session closed and shift settled.'),
+                'completingSale' => __('Completing sale...'),
+                'completeSale' => __('Confirm and complete sale'),
+                'saleCompleted' => __('Invoice completed'),
+                'loadingRecords' => __('Loading records...'),
+                'loadingData' => __('Loading data...'),
+                'records' => __('records'),
+                'page' => __('Page'),
+                'of' => __('of'),
+                'actions' => __('Actions'),
+                'yes' => __('Yes'),
+                'no' => __('No'),
+                'active' => __('Active'),
+                'inactive' => __('Inactive'),
+                'completed' => __('Completed'),
+                'pending' => __('Under review'),
+                'approved' => __('Approved'),
+                'rejected' => __('Rejected'),
+                'paid' => __('Paid'),
+                'partial' => __('Partially paid'),
+                'unpaid' => __('Unpaid'),
+                'received' => __('Received'),
+                'open' => __('Open'),
+                'closed' => __('Closed'),
+                'noRecords' => __('No matching records'),
+                'changeSearchOrAdd' => __('Try a different search or add a new record.'),
+                'selectValue' => __('Select a value'),
+                'previous' => __('Previous'),
+                'next' => __('Next'),
+                'edit' => __('Edit'),
+                'delete' => __('Delete'),
+                'editRecord' => __('Edit record'),
+                'newRecord' => __('Add new record'),
+                'recordDetails' => __('Record details'),
+                'addRecord' => __('Add record'),
+                'saveChanges' => __('Save changes'),
+                'couldNotLoad' => __('Could not load data'),
+                'deleteConfirm' => __('Delete this record? This action cannot be undone.'),
+                'deleted' => __('Record deleted.'),
+                'saving' => __('Saving...'),
+                'updated' => __('Record updated.'),
+                'created' => __('Record added.'),
+                'typeCashDrawer' => __('Cash drawer'),
+                'typeMainSafe' => __('Main safe'),
+                'typeBank' => __('Bank or network'),
             ];
         @endphp
         <script>
@@ -181,7 +182,7 @@
     </head>
     <body class="font-sans antialiased">
         <div class="pharmacy-shell">
-            <button class="sidebar-backdrop" type="button" aria-label="{{ __('إغلاق القائمة') }}" data-sidebar-close></button>
+            <button class="sidebar-backdrop" type="button" aria-label="{{ __('Close navigation') }}" data-sidebar-close></button>
             <aside class="pharmacy-sidebar" id="pharmacy-sidebar">
                 <a class="brand-lockup" href="{{ route('dashboard') }}">
                     <span class="brand-mark" aria-hidden="true">
@@ -190,21 +191,21 @@
                         </svg>
                     </span>
                     <span class="brand-copy">
-                        <strong>{{ config('app.name', 'شفاء') }}</strong>
-                        <small>{{ __('نظام إدارة الصيدلية') }}</small>
+                        <strong>{{ $appName }}</strong>
+                        <small>{{ __('Pharmacy management system') }}</small>
                     </span>
                 </a>
 
                 <div class="sidebar-branch">
                     <span class="branch-pulse"></span>
                     <span class="branch-copy">
-                        <small>{{ __('الموقع الحالي') }}</small>
-                        <strong>{{ auth()->user()->branch?->name ?? __('الإدارة المركزية') }}</strong>
+                        <small>{{ __('Current location') }}</small>
+                        <strong>{{ auth()->user()->branch?->name ?? __('Head office') }}</strong>
                     </span>
                     <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
-                <nav class="sidebar-nav" aria-label="{{ __('التنقل الرئيسي') }}">
+                <nav class="sidebar-nav" aria-label="{{ __('Main navigation') }}">
                     @foreach ($groups as $group)
                         @php
                             $visibleLinks = collect($group['links'])->filter(fn ($link) => in_array($role, $link['roles'], true));
@@ -246,25 +247,25 @@
                     <div class="support-card">
                         <span class="support-icon">✦</span>
                         <div>
-                            <strong>{{ __('مساعدة سريعة') }}</strong>
-                            <small>{{ __('النظام جاهز لمساعدتك') }}</small>
+                            <strong>{{ __('Quick help') }}</strong>
+                            <small>{{ __('The system is ready to help') }}</small>
                         </div>
                     </div>
-                    <div class="sidebar-version">شفاء <span>•</span> {{ __('إصدار النظام') }}</div>
+                    <div class="sidebar-version">{{ __('Shifa') }} <span>•</span> {{ __('System version') }}</div>
                 </div>
             </aside>
 
             <div class="pharmacy-main">
                 <header class="pharmacy-topbar">
                     <div class="topbar-leading">
-                        <button class="icon-button mobile-menu-button" type="button" aria-label="{{ __('فتح القائمة') }}" aria-controls="pharmacy-sidebar" aria-expanded="false" data-sidebar-toggle>
+                        <button class="icon-button mobile-menu-button" type="button" aria-label="{{ __('Open navigation') }}" aria-controls="pharmacy-sidebar" aria-expanded="false" data-sidebar-toggle>
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                         </button>
-                        <button class="icon-button sidebar-collapse-button" type="button" aria-label="{{ __('تصغير القائمة') }}" aria-controls="pharmacy-sidebar" aria-pressed="false" data-sidebar-collapse-toggle title="{{ __('تصغير القائمة') }}">
+                        <button class="icon-button sidebar-collapse-button" type="button" aria-label="{{ __('Collapse sidebar') }}" aria-controls="pharmacy-sidebar" aria-pressed="false" data-sidebar-collapse-toggle title="{{ __('Collapse sidebar') }}">
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16M9 5v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
                         </button>
                         <div class="topbar-title">
-                            <span class="topbar-eyebrow">{{ __('نظام شفاء للصيدليات') }}</span>
+                            <span class="topbar-eyebrow">{{ __('Shifa Pharmacy System') }}</span>
                             <h1>{{ __($title) }}</h1>
                         </div>
                     </div>
@@ -276,9 +277,9 @@
                         <form class="locale-switch" method="POST" action="{{ route('locale.switch') }}">
                             @csrf
                             <input type="hidden" name="return_to" value="{{ request()->getRequestUri() }}">
-                            <label class="sr-only" for="locale-switch-select">{{ __('اللغة') }}</label>
-                            <select id="locale-switch-select" name="locale" aria-label="{{ __('اللغة') }}" onchange="this.form.submit()">
-                                <option value="ar" @selected(app()->getLocale() === 'ar')>{{ __('العربية') }}</option>
+                            <label class="sr-only" for="locale-switch-select">{{ __('Language') }}</label>
+                            <select id="locale-switch-select" name="locale" aria-label="{{ __('Language') }}" onchange="this.form.submit()">
+                                <option value="ar" @selected(app()->getLocale() === 'ar')>{{ __('Arabic') }}</option>
                                 <option value="en" @selected(app()->getLocale() === 'en')>English</option>
                             </select>
                         </form>
@@ -287,15 +288,15 @@
                                 <span class="user-avatar">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
                                 <span class="user-copy">
                                     <strong>{{ auth()->user()->name }}</strong>
-                                    <small>{{ $roleLabels[auth()->user()->role] ?? __('مستخدم') }}</small>
+                                    <small>{{ $roleLabels[auth()->user()->role] ?? __('User') }}</small>
                                 </span>
                                 <svg class="user-menu-chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
                             <div class="user-menu-panel" data-user-menu-panel hidden>
-                                <a href="{{ route('profile') }}">{{ __('حسابي') }}</a>
+                                <a href="{{ route('profile') }}">{{ __('My profile') }}</a>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit">{{ __('تسجيل الخروج') }}</button>
+                                    <button type="submit">{{ __('Sign out') }}</button>
                                 </form>
                             </div>
                         </div>
@@ -306,8 +307,8 @@
                     {{ $slot }}
                 </main>
                 <footer class="pharmacy-footer">
-                    <span>© {{ now()->year }} {{ config('app.name', 'شفاء') }}</span>
-                    <span>{{ __('صحة أفضل، بإدارة أدق') }}</span>
+                    <span>© {{ now()->year }} {{ $appName }}</span>
+                    <span>{{ __('Better health, better management') }}</span>
                 </footer>
             </div>
         </div>

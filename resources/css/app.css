@@ -127,6 +127,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     transition: max-height .26s ease, opacity .2s ease;
 }
 .nav-group:not(.is-open) .nav-group-links { max-height: 0; opacity: .35; }
+.nav-group.is-flyout .nav-group-links {
+    background: #102f40;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(8,31,43,.28);
+    max-height: calc(100vh - 16px);
+    opacity: 1;
+    overflow-y: auto;
+    padding: 8px;
+    position: fixed;
+    transition: opacity .2s ease;
+    width: 240px;
+    z-index: 80;
+}
+.nav-group.is-flyout:not(.is-open) .nav-group-links { display: none; }
 .nav-group:not(.is-open) .nav-group-toggle svg { transform: rotate(0); }
 .nav-group.is-open .nav-group-toggle svg { transform: rotate(180deg); }
 .nav-group-toggle[aria-expanded="false"] svg { transform: rotate(0); }
@@ -758,6 +773,17 @@ body.sidebar-collapsed .sidebar-collapse-button svg { transform: rotate(180deg);
 .auth-orbit-one { height: 490px; inset-inline-start: -200px; top: 24%; width: 490px; }
 .auth-orbit-two { height: 680px; inset-inline-start: -290px; top: 16%; width: 680px; }
 .auth-form-panel { align-items: center; display: flex; flex-direction: column; justify-content: center; padding: 42px clamp(25px, 5vw, 75px); }
+.auth-locale-switch { align-self: flex-end; margin-bottom: 12px; }
+.auth-locale-switch select, .landing-locale-switch select {
+    background: #fff;
+    border: 1px solid #e1e9eb;
+    border-radius: 8px;
+    color: #536871;
+    font-size: 10px;
+    min-height: 34px;
+    padding: 0 10px;
+}
+.landing-locale-switch select { background: rgba(255,255,255,.82); }
 .auth-card { max-width: 405px; width: 100%; }
 .auth-form-content { margin-bottom: 24px; }
 .auth-form-content .eyebrow { margin-bottom: 7px; }
@@ -795,6 +821,7 @@ body.sidebar-collapsed .sidebar-collapse-button svg { transform: rotate(180deg);
 .landing-nav .brand-copy strong { color: #163644; }
 .landing-nav .brand-copy small { color: #8c9ca2; }
 .landing-nav-actions { align-items: center; display: flex; gap: 22px; }
+.landing-locale-switch { margin: 0; }
 .landing-status { align-items: center; color: #6f828a; display: flex; font-size: 9px; gap: 7px; }
 .landing-status i { background: #28b68c; border-radius: 50%; height: 6px; width: 6px; }
 .landing-main { margin: 0 auto; max-width: 1480px; padding: 0 clamp(20px, 7vw, 105px); }

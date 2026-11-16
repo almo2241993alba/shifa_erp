@@ -1,9 +1,9 @@
-<x-pharmacy-layout :title="__('طلبات التسجيل')">
+<x-pharmacy-layout :title="__('Registration requests')">
     <section class="page-intro">
         <div>
-            <span class="eyebrow">{{ __('إدارة الحسابات') }}</span>
-            <h2>{{ __('طلبات التسجيل') }}</h2>
-            <p>{{ __('راجع بيانات المتقدم، ثم اختر فرعه وصلاحيته قبل تفعيل الحساب.') }}</p>
+            <span class="eyebrow">{{ __('Account management') }}</span>
+            <h2>{{ __('Registration requests') }}</h2>
+            <p>{{ __('Review the applicant, then choose a branch and role before activating the account.') }}</p>
         </div>
     </section>
 
@@ -15,7 +15,7 @@
         <div class="table-wrap">
             <table class="data-table">
                 <thead>
-                    <tr><th>{{ __('الاسم') }}</th><th>{{ __('البريد الإلكتروني') }}</th><th>{{ __('تاريخ الطلب') }}</th><th>{{ __('اعتماد الحساب') }}</th></tr>
+                    <tr><th>{{ __('Name') }}</th><th>{{ __('Email') }}</th><th>{{ __('Request date') }}</th><th>{{ __('Approve account') }}</th></tr>
                 </thead>
                 <tbody>
                     @forelse ($requests as $registration)
@@ -26,26 +26,26 @@
                             <td>
                                 <form class="approval-form" method="POST" action="{{ route('pharmacy.registration-requests.approve', $registration) }}">
                                     @csrf
-                                    <label class="sr-only" for="branch-{{ $registration->id }}">{{ __('الفرع') }}</label>
+                                    <label class="sr-only" for="branch-{{ $registration->id }}">{{ __('Branch') }}</label>
                                     <select id="branch-{{ $registration->id }}" name="branch_id" required>
-                                        <option value="">{{ __('اختر الفرع') }}</option>
+                                        <option value="">{{ __('Select branch') }}</option>
                                         @foreach ($branches as $branch)
                                             <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="sr-only" for="role-{{ $registration->id }}">{{ __('الصلاحية') }}</label>
+                                    <label class="sr-only" for="role-{{ $registration->id }}">{{ __('Role') }}</label>
                                     <select id="role-{{ $registration->id }}" name="role" required>
-                                        <option value="cashier">{{ __('كاشير') }}</option>
-                                        <option value="pharmacist">{{ __('صيدلي') }}</option>
-                                        <option value="accountant">{{ __('محاسب') }}</option>
-                                        <option value="storekeeper">{{ __('أمين مخزن') }}</option>
+                                        <option value="cashier">{{ __('Cashier') }}</option>
+                                        <option value="pharmacist">{{ __('Pharmacist') }}</option>
+                                        <option value="accountant">{{ __('Accountant') }}</option>
+                                        <option value="storekeeper">{{ __('Storekeeper') }}</option>
                                     </select>
-                                    <button class="button button-primary button-small" type="submit">{{ __('اعتماد') }}</button>
+                                    <button class="button button-primary button-small" type="submit">{{ __('Approve') }}</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr><td class="table-muted" colspan="4">{{ __('لا توجد طلبات تسجيل معلقة.') }}</td></tr>
+                        <tr><td class="table-muted" colspan="4">{{ __('There are no pending registration requests.') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -45,6 +45,96 @@ class PharmacyPagesTest extends TestCase
             ->assertDontSee('INV-CASHIER-2');
     }
 
+    public function test_admin_sales_report_includes_all_cashiers_sales_in_their_branch(): void
+    {
+        $branch = Branch::create(['name' => 'Main', 'code' => 'MAIN']);
+        $admin = User::factory()->create(['role' => 'admin', 'branch_id' => $branch->id]);
+        $firstCashier = User::factory()->create(['role' => 'cashier', 'branch_id' => $branch->id]);
+        $otherCashier = User::factory()->create(['role' => 'cashier', 'branch_id' => $branch->id]);
+        $this->createSale($branch, $firstCashier, 'INV-ADMIN-1');
+        $this->createSale($branch, $otherCashier, 'INV-ADMIN-2');
+
+        $this->actingAs($admin)
+            ->get('/pharmacy/reports?from_date='.today()->toDateString().'&to_date='.today()->toDateString())
+            ->assertOk()
+            ->assertSee('INV-ADMIN-1')
+            ->assertSee('INV-ADMIN-2')
+            ->assertSee($firstCashier->name)
+            ->assertSee($otherCashier->name);
+    }
+
+    public function test_report_text_and_direction_follow_the_selected_locale(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)
+            ->withSession(['locale' => 'en'])
+            ->get('/pharmacy/reports')
+            ->assertOk()
+            ->assertSee('<html lang="en" dir="ltr">', false)
+            ->assertSee('Sales reports')
+            ->assertSee('Performance analysis')
+            ->assertDontSee('تحليل الأداء');
+
+        $this->withSession(['locale' => 'ar'])
+            ->get('/pharmacy/reports')
+            ->assertOk()
+            ->assertSee('<html lang="ar" dir="rtl">', false)
+            ->assertSee('تقارير المبيعات')
+            ->assertSee('تحليل الأداء');
+    }
+
+    public function test_guest_pages_render_in_the_selected_locale(): void
+    {
+        $this->withSession(['locale' => 'en'])
+            ->get('/login')
+            ->assertOk()
+            ->assertSee('<html lang="en" dir="ltr">', false)
+            ->assertSee('Sign in')
+            ->assertDontSee('تسجيل الدخول');
+
+        $this->withSession(['locale' => 'en'])
+            ->get('/')
+            ->assertOk()
+            ->assertSee('<html lang="en" dir="ltr">', false)
+            ->assertSee('Smart pharmacy management')
+            ->assertDontSee('إدارة الصيدلية الذكية');
+
+        $this->withSession(['locale' => 'ar'])
+            ->get('/login')
+            ->assertOk()
+            ->assertSee('<html lang="ar" dir="rtl">', false)
+            ->assertSee('تسجيل الدخول');
+
+        $this->withSession(['locale' => 'ar'])
+            ->get('/')
+            ->assertOk()
+            ->assertSee('<html lang="ar" dir="rtl">', false)
+            ->assertSee('إدارة الصيدلية الذكية');
+    }
+
+    public function test_management_page_metadata_is_translated_with_english_keys(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $englishResponse = $this->actingAs($admin)
+            ->withSession(['locale' => 'en'])
+            ->get('/pharmacy/manage/medicines')
+            ->assertOk()
+            ->assertSee('Medicines and inventory')
+            ->assertSee('Medicine name')
+            ->assertDontSee('اسم الدواء');
+        $englishConfig = $this->managementPageConfig($englishResponse->getContent());
+        $this->assertSame('Medicine name', $englishConfig['columns'][0]['label']);
+
+        $arabicResponse = $this->withSession(['locale' => 'ar'])
+            ->get('/pharmacy/manage/medicines')
+            ->assertOk()
+            ->assertSee('الأدوية والمخزون');
+        $arabicConfig = $this->managementPageConfig($arabicResponse->getContent());
+        $this->assertSame('اسم الدواء', $arabicConfig['columns'][0]['label']);
+    }
+
     public function test_admin_can_create_an_employee_from_the_wizard_form(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
@@ -171,5 +261,16 @@ class PharmacyPagesTest extends TestCase
             'payment_method' => 'cash',
             'status' => 'completed',
         ]);
+    }
+
+    private function managementPageConfig(string $html): array
+    {
+        preg_match('/data-config="([^"]*)"/', $html, $matches);
+
+        return json_decode(
+            html_entity_decode($matches[1] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            true,
+            flags: JSON_THROW_ON_ERROR,
+        );
     }
 }

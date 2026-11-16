@@ -48,48 +48,48 @@ new #[Layout('layouts.guest')] class extends Component
 
 <div>
     <div class="auth-form-content">
-        <span class="eyebrow">إنشاء حساب جديد</span>
-        <h2>تسجيل مستخدم جديد</h2>
-        <p class="auth-form-description">أرسل بياناتك للمدير العام. سيُفعّل حسابك بعد المراجعة.</p>
+        <span class="eyebrow">{{ __('Create a new account') }}</span>
+        <h2>{{ __('Register a new user') }}</h2>
+        <p class="auth-form-description">{{ __('Send your details to the general manager. Your account will be activated after review.') }}</p>
     </div>
     <form wire:submit="register" data-wizard data-wizard-start="{{ $errors->hasAny(['password', 'password_confirmation']) ? 1 : 0 }}">
         <section class="wizard-step" data-wizard-step="0">
             <div class="auth-field">
-                <label class="field-label" for="name">الاسم الكامل</label>
+                <label class="field-label" for="name">{{ __('Full name') }}</label>
                 <x-text-input wire:model="name" id="name" class="auth-input" type="text" name="name" required autofocus autocomplete="name" />
                 <x-input-error :messages="$errors->get('name')" class="auth-field-error" />
             </div>
 
             <div class="auth-field">
-                <label class="field-label" for="email">البريد الإلكتروني</label>
+                <label class="field-label" for="email">{{ __('Email') }}</label>
                 <x-text-input wire:model="email" id="email" class="auth-input" type="email" name="email" required autocomplete="username" />
                 <x-input-error :messages="$errors->get('email')" class="auth-field-error" />
             </div>
 
-            <button class="button button-primary auth-submit" type="button" data-wizard-next>التالي</button>
+            <button class="button button-primary auth-submit" type="button" data-wizard-next>{{ __('Next') }}</button>
         </section>
 
         <section class="wizard-step" data-wizard-step="1" hidden>
             <div class="auth-field">
-                <label class="field-label" for="password">كلمة المرور</label>
+                <label class="field-label" for="password">{{ __('Password') }}</label>
                 <x-text-input wire:model="password" id="password" class="auth-input" type="password" name="password" required autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password')" class="auth-field-error" />
             </div>
 
             <div class="auth-field">
-                <label class="field-label" for="password_confirmation">تأكيد كلمة المرور</label>
+                <label class="field-label" for="password_confirmation">{{ __('Confirm Password') }}</label>
                 <x-text-input wire:model="password_confirmation" id="password_confirmation" class="auth-input" type="password" name="password_confirmation" required autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password_confirmation')" class="auth-field-error" />
             </div>
 
             <div class="auth-register-actions">
-                <button class="button button-secondary auth-submit" type="button" data-wizard-previous>السابق</button>
-                <button class="button button-primary auth-submit" type="submit">إرسال طلب التسجيل</button>
+                <button class="button button-secondary auth-submit" type="button" data-wizard-previous>{{ __('Previous') }}</button>
+                <button class="button button-primary auth-submit" type="submit">{{ __('Submit registration request') }}</button>
             </div>
         </section>
 
         <div class="auth-register-actions">
-            <a class="auth-inline-link" href="{{ route('login') }}" wire:navigate>لديك حساب بالفعل؟ سجل الدخول</a>
+            <a class="auth-inline-link" href="{{ route('login') }}" wire:navigate>{{ __('Already have an account? Sign in') }}</a>
         </div>
     </form>
 </div>

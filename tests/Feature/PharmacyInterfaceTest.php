@@ -20,6 +20,7 @@ class PharmacyInterfaceTest extends TestCase
     public function test_admin_management_screen_uses_the_pharmacy_workspace(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'admin']))
+            ->withSession(['locale' => 'ar'])
             ->get('/pharmacy/manage/categories')
             ->assertOk()
             ->assertSee('تصنيفات الأدوية')
